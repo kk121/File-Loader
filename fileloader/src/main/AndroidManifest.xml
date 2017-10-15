@@ -2,7 +2,8 @@
 
     package="com.krishna.fileloader">
 
-    <application android:allowBackup="true" android:label="@string/app_name"
+    <application
+        android:label="@string/app_name"
         android:supportsRtl="true">
 
     </application>
