@@ -5,7 +5,7 @@ package com.krishna.fileloader.utility;
  */
 
 public class FileExtension {
-    public static final String NONE = "";
+    public static final String UNKNOWN = "";
     public static final String IMAGE = ".jpg";
     public static final String JSON = ".json";
     public static final String PDF = ".pdf";

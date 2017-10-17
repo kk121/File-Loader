@@ -1,10 +1,5 @@
 package com.krishna.fileloader.utility;
 
-import android.graphics.drawable.Drawable;
-
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.signature.ObjectKey;
 import com.google.gson.Gson;
 
 import java.io.File;
@@ -39,13 +34,5 @@ public class Utils {
         Object object = in.readObject();
         in.close();
         return object;
-    }
-
-    public static RequestOptions getGlideDefaultRequestOptions(Drawable placeholder) {
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.skipMemoryCache(true);
-        requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE);
-        requestOptions.signature(new ObjectKey(System.currentTimeMillis()));
-        return requestOptions;
     }
 }

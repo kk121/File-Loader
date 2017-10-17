@@ -2,16 +2,12 @@ package com.krishna.fileloader.builder;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.krishna.fileloader.FileLoader;
 import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.pojo.FileResponse;
 import com.krishna.fileloader.request.FileLoadRequest;
 import com.krishna.fileloader.utility.FileExtension;
-import com.krishna.fileloader.utility.Utils;
 
 import java.io.File;
 
@@ -24,7 +20,7 @@ public class FileLoaderBuilder {
     private String uri;
     private String directoryName = FileLoader.DEFAULT_DIR_NAME;
     private int directoryType = FileLoader.DEFAULT_DIR_TYPE;
-    private String fileExtension = FileExtension.NONE;
+    private String fileExtension = FileExtension.UNKNOWN;
 
     private FileRequestListener listener;
     @FileLoadRequest.ReturnFileType
@@ -99,30 +95,6 @@ public class FileLoaderBuilder {
         this.listener = listener;
         buildFileLoader();
         fileLoader.loadFileAsync();
-    }
-
-    public void into(final ImageView imageView, final Drawable placeholder) {
-        returnFileType = FileLoadRequest.TYPE_FILE;
-        this.listener = new FileRequestListener<File>() {
-            @Override
-            public void onLoad(FileLoadRequest request, FileResponse<File> response) {
-                //Load returned image file into imageView using Glide
-                Glide.with(context).setDefaultRequestOptions(Utils.getGlideDefaultRequestOptions(placeholder)).load(response.getBody()).into(imageView);
-            }
-
-            @Override
-            public void onError(FileLoadRequest request, Throwable t) {
-
-            }
-        };
-        //show placeholder
-        Glide.with(context).setDefaultRequestOptions(Utils.getGlideDefaultRequestOptions(placeholder)).load("").into(imageView);
-        buildFileLoader();
-        fileLoader.loadFileAsync();
-    }
-
-    public void into(final ImageView imageView) {
-        into(imageView, null);
     }
 
     private void buildFileLoader() {

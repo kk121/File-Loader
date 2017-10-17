@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.krishna.fileloader.FileLoader;
 import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.pojo.FileResponse;
@@ -24,16 +26,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final ImageView iv = (ImageView) findViewById(R.id.image);
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressbar);
+        final TextView tvProgress = (TextView) findViewById(R.id.tv_progress);
 
         //Asynchronously load file as generic file
         FileLoader.with(this)
                 .load("https://upload.wikimedia.org/wikipedia/commons/3/3c/Enrique_Simonet_-_Marina_veneciana_6MB.jpg")
-                .fromDirectory("test3", FileLoader.DIR_INTERNAL)
+                .fromDirectory("test4", FileLoader.DIR_INTERNAL)
                 .asFile(new FileRequestListener<File>() {
                     @Override
                     public void onLoad(FileLoadRequest request, FileResponse<File> response) {
                         Bitmap bitmap = BitmapFactory.decodeFile(response.getDownloadedFile().getPath());
-                        iv.setImageBitmap(bitmap);
+//                        iv.setImageBitmap(bitmap);
+                        Glide.with(MainActivity.this).load(response.getBody()).into(iv);
                     }
 
                     @Override
@@ -41,12 +45,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "onError: " + t.getMessage());
                     }
                 });
-
-        //load image into imageView
-        FileLoader.with(this)
-                .load("https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg")
-                .fromDirectory("test3", FileLoader.DIR_INTERNAL)
-                .into(iv);
 
 
         //Synchronous json file loading
@@ -61,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        String[] uris = {"https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg",
-                "https://upload.wikimedia.org/wikipedia/commons/3/3c/Enrique_Simonet_-_Marina_veneciana_6MB.jpg", ".png"};
+        final String[] uris = {"https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg",
+                "https://upload.wikimedia.org/wikipedia/commons/3/3c/Enrique_Simonet_-_Marina_veneciana_6MB.jpg"};
         //delete files
         FileLoader.deleteWith(this).fromDirectory("test2", FileLoader.DIR_INTERNAL).deleteFiles(uris);
 
@@ -71,5 +69,35 @@ public class MainActivity extends AppCompatActivity {
 
         //delete all files from directory except files passed in argument
         FileLoader.deleteWith(this).fromDirectory("test3", FileLoader.DIR_INTERNAL).deleteAllFilesExcept(uris);
+
+       /* FileLoader.multiFileDownload(this).fromDirectory("test4", FileLoader.DIR_INTERNAL)
+                .progressListener(new MultiFileDownloadListener() {
+                    @Override
+                    public void onProgress(int progress, int totalFiles) {
+                        tvProgress.setText(progress + " of " + totalFiles);
+                        if (progress == totalFiles) {
+                            loadImage(iv, uris[0]);
+                        }
+                    }
+                }).loadMultiple(uris);*/
+    }
+
+    private void loadImage(final ImageView iv, String imageUrl) {
+        iv.setImageBitmap(null);
+        FileLoader.with(this)
+                .load(imageUrl)
+                .fromDirectory("test4", FileLoader.DIR_INTERNAL)
+                .asFile(new FileRequestListener<File>() {
+                    @Override
+                    public void onLoad(FileLoadRequest request, FileResponse<File> response) {
+                        Bitmap bitmap = BitmapFactory.decodeFile(response.getDownloadedFile().getPath());
+                        iv.setImageBitmap(bitmap);
+                    }
+
+                    @Override
+                    public void onError(FileLoadRequest request, Throwable t) {
+                        Log.d(TAG, "onError: " + t.getMessage());
+                    }
+                });
     }
 }

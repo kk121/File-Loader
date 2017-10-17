@@ -25,7 +25,7 @@ public class FileLoadRequest {
     private int directoryType;
     @ReturnFileType
     private int fileType;
-    private String fileExtension = FileExtension.NONE;
+    private String fileExtension = FileExtension.UNKNOWN;
     private Class requestClass;
     private FileRequestListener requestListener;
 
@@ -37,6 +37,12 @@ public class FileLoadRequest {
         this.requestClass = requestClass;
         this.fileExtension = fileExtension;
         this.requestListener = listener;
+    }
+
+    public FileLoadRequest(String uri, String directoryName, int directoryType) {
+        this.uri = uri;
+        this.directoryName = directoryName;
+        this.directoryType = directoryType;
     }
 
     public String getUri() {

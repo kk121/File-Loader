@@ -5,9 +5,11 @@ import android.os.AsyncTask;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.krishna.fileloader.builder.FileDeleteBuilder;
 import com.krishna.fileloader.builder.FileLoaderBuilder;
+import com.krishna.fileloader.builder.MultiFileDownloader;
 import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.network.FileDownloader;
 import com.krishna.fileloader.pojo.DownloadResponse;
@@ -34,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class FileLoader {
+    private static final String TAG = "FileLoader";
     // Directory type
     public static final int DIR_INTERNAL = 1;
     public static final int DIR_CACHE = 2;
@@ -65,6 +68,10 @@ public class FileLoader {
 
     public static FileDeleteBuilder deleteWith(Context context) {
         return new FileDeleteBuilder(context);
+    }
+
+    public static MultiFileDownloader multiFileDownload(Context context) {
+        return new MultiFileDownloader(context);
     }
 
     public FileResponse loadFile() throws Exception {
@@ -240,11 +247,12 @@ public class FileLoader {
                     loadedFile = searchAndGetLocalFile();
                     if (loadedFile == null || !loadedFile.exists()) {
                         //download from internet
-                        FileDownloader downloader = new FileDownloader(context, fileLoadRequest);
+                        FileDownloader downloader = new FileDownloader(context, fileLoadRequest.getUri(), fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
                         loadedFile = downloader.download();
                     }
                     downloadResponse.setDownloadedFile(loadedFile);
                 } catch (Exception e) {
+                    Log.d(TAG, "doInBackground: " + e.getMessage());
                     downloadResponse.setE(e);
                 }
                 return downloadResponse;

@@ -3,7 +3,6 @@ package com.krishna.fileloader.network;
 import android.content.Context;
 import android.support.annotation.WorkerThread;
 
-import com.krishna.fileloader.request.FileLoadRequest;
 import com.krishna.fileloader.utility.AndroidFileManager;
 
 import java.io.File;
@@ -20,24 +19,28 @@ import okio.Okio;
  */
 
 public class FileDownloader {
-    private FileLoadRequest fileLoadRequest;
+    private String uri;
+    private String dirName;
+    private int dirType;
     private OkHttpClient httpClient;
     private Context context;
 
-    public FileDownloader(Context context, FileLoadRequest fileLoadRequest) {
-        this.fileLoadRequest = fileLoadRequest;
+    public FileDownloader(Context context, String uri, String dirName, int dirType) {
+        this.uri = uri;
+        this.dirName = dirName;
+        this.dirType = dirType;
         this.httpClient = new OkHttpClient();
         this.context = context.getApplicationContext();
     }
 
     @WorkerThread
     public File download() throws Exception {
-        Request request = new Request.Builder().url(fileLoadRequest.getUri()).build();
+        Request request = new Request.Builder().url(uri).build();
         Response response = httpClient.newCall(request).execute();
         if (!response.isSuccessful() || response.body() == null) {
             throw new IOException("Failed to download file: " + response);
         }
-        File downloadedFile = AndroidFileManager.getFileForRequest(context, fileLoadRequest.getUri(), fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
+        File downloadedFile = AndroidFileManager.getFileForRequest(context, uri, dirName, dirType);
         BufferedSink sink = Okio.buffer(Okio.sink(downloadedFile));
         sink.writeAll(response.body().source());
         sink.close();
