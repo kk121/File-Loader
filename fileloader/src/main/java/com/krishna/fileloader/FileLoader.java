@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 
 
 /**
@@ -51,8 +51,11 @@ public class FileLoader {
     public @interface DirectoryType {
     }
 
-    private static Set<FileLoadRequest> fileLoadRequestSet = new HashSet<>();
-    private static Map<FileLoadRequest, List<FileRequestListener>> requestListenersMap = new ConcurrentHashMap<>();
+    private static Map<FileLoadRequest, Boolean> backingMap = new WeakHashMap<>();
+    private static Set<FileLoadRequest> fileLoadRequestSet = Collections.newSetFromMap(backingMap);
+    private static Map<FileLoadRequest, List<FileRequestListener>> requestListenersMap = new WeakHashMap<>();
+    private static final Object REQUEST_QUEUE_LOCK = new Object();
+    private static final Object REQUEST_LISTENER_QUEUE_LOCK = new Object();
 
     private Context context;
     private FileLoadRequest fileLoadRequest;
@@ -94,10 +97,11 @@ public class FileLoader {
             return;
         }
         // All parameters are valid, move to next step
-        if (fileLoadRequestSet.contains(fileLoadRequest)) {
-            requestListenersMap.get(fileLoadRequest).add(fileLoadRequest.getRequestListener());
-        } else {
-            addRequestToQueue();
+        addRequestListenerToQueue();
+        if (!fileLoadRequestSet.contains(fileLoadRequest)) {
+            synchronized (REQUEST_QUEUE_LOCK) {
+                fileLoadRequestSet.add(fileLoadRequest);
+            }
             getFileLoaderAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
@@ -157,20 +161,33 @@ public class FileLoader {
             throw new NullPointerException("File extension should not be null");
     }
 
-    private void addRequestToQueue() {
-        fileLoadRequestSet.add(fileLoadRequest);
-        List<FileRequestListener> listeners = Collections.synchronizedList(new ArrayList<FileRequestListener>());
-        listeners.add(fileLoadRequest.getRequestListener());
-        requestListenersMap.put(fileLoadRequest, listeners);
+    private void addRequestListenerToQueue() {
+        if (requestListenersMap.containsKey(fileLoadRequest)) {
+            synchronized (REQUEST_LISTENER_QUEUE_LOCK) {
+                requestListenersMap.get(fileLoadRequest).add(fileLoadRequest.getRequestListener());
+            }
+        } else {
+            List<FileRequestListener> listenersList = new ArrayList<>();
+            listenersList.add(fileLoadRequest.getRequestListener());
+            requestListenersMap.put(fileLoadRequest, listenersList);
+        }
     }
 
     private void callFailureMethodsOfListeners(Throwable t) {
         if (!requestListenersMap.isEmpty()) {
-            for (FileRequestListener listener : requestListenersMap.get(fileLoadRequest)) {
-                listener.onError(fileLoadRequest, t);
+            synchronized (REQUEST_LISTENER_QUEUE_LOCK) {
+                for (FileRequestListener listener : requestListenersMap.get(fileLoadRequest)) {
+                    try {
+                        listener.onError(fileLoadRequest, t);
+                    } catch (Exception e) {
+                        //ignore
+                    }
+                }
+                requestListenersMap.remove(fileLoadRequest);
             }
-            requestListenersMap.remove(fileLoadRequest);
-            fileLoadRequestSet.remove(fileLoadRequest);
+            synchronized (REQUEST_QUEUE_LOCK) {
+                fileLoadRequestSet.remove(fileLoadRequest);
+            }
         }
     }
 
@@ -192,11 +209,19 @@ public class FileLoader {
     private void sendFileResponseToListeners(File loadedFile) {
         if (!requestListenersMap.isEmpty()) {
             FileResponse fileResponse = createFileResponse(loadedFile);
-            for (FileRequestListener listener : requestListenersMap.get(fileLoadRequest)) {
-                listener.onLoad(fileLoadRequest, fileResponse);
+            synchronized (REQUEST_LISTENER_QUEUE_LOCK) {
+                for (FileRequestListener listener : requestListenersMap.get(fileLoadRequest)) {
+                    try {
+                        listener.onLoad(fileLoadRequest, fileResponse);
+                    } catch (Exception e) {
+                        callFailureMethodsOfListeners(e);
+                    }
+                }
+                requestListenersMap.remove(fileLoadRequest);
             }
-            requestListenersMap.remove(fileLoadRequest);
-            fileLoadRequestSet.remove(fileLoadRequest);
+            synchronized (REQUEST_QUEUE_LOCK) {
+                fileLoadRequestSet.remove(fileLoadRequest);
+            }
         }
     }
 

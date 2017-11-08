@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.krishna.fileloader.FileLoader;
 import com.krishna.fileloader.listener.FileRequestListener;
+import com.krishna.fileloader.listener.MultiFileDownloadListener;
 import com.krishna.fileloader.pojo.FileResponse;
 import com.krishna.fileloader.request.FileLoadRequest;
 
@@ -70,16 +71,14 @@ public class MainActivity extends AppCompatActivity {
         //delete all files from directory except files passed in argument
         FileLoader.deleteWith(this).fromDirectory("test3", FileLoader.DIR_INTERNAL).deleteAllFilesExcept(uris);
 
-       /* FileLoader.multiFileDownload(this).fromDirectory("test4", FileLoader.DIR_INTERNAL)
+        FileLoader.multiFileDownload(this).fromDirectory("test4", FileLoader.DIR_INTERNAL)
                 .progressListener(new MultiFileDownloadListener() {
                     @Override
-                    public void onProgress(int progress, int totalFiles) {
+                    public void onProgress(File downloadedFile, int progress, int totalFiles) {
                         tvProgress.setText(progress + " of " + totalFiles);
-                        if (progress == totalFiles) {
-                            loadImage(iv, uris[0]);
-                        }
+                        Glide.with(MainActivity.this).load(downloadedFile).into(iv);
                     }
-                }).loadMultiple(uris);*/
+                }).loadMultiple(uris);
     }
 
     private void loadImage(final ImageView iv, String imageUrl) {

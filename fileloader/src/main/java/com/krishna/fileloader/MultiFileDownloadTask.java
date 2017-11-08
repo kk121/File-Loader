@@ -6,22 +6,25 @@ import android.os.AsyncTask;
 import com.krishna.fileloader.listener.MultiFileDownloadListener;
 import com.krishna.fileloader.network.FileDownloader;
 
+import java.io.File;
+
 /**
  * Created by krishna on 17/10/17.
  */
 
-public class FileDownloadTask extends AsyncTask<String, Integer, Void> {
+public class MultiFileDownloadTask extends AsyncTask<String, Integer, Void> {
     private MultiFileDownloadListener listener;
     private String dirName;
     private int dirType;
     private Context context;
     private int totalTasks = 0;
     private int progress = 0;
+    private File downloadedFile;
 
-    public FileDownloadTask(Context context, String dirName, int dirType, MultiFileDownloadListener listener) {
+    public MultiFileDownloadTask(Context context, String dirName, int dirType, MultiFileDownloadListener listener) {
         this.dirName = dirName;
         this.dirType = dirType;
-        this.context = context;
+        this.context = context.getApplicationContext();
         this.listener = listener;
     }
 
@@ -31,7 +34,7 @@ public class FileDownloadTask extends AsyncTask<String, Integer, Void> {
         for (String url : urls) {
             try {
                 FileDownloader downloader = new FileDownloader(context, url, dirName, dirType);
-                downloader.download();
+                downloadedFile = downloader.download();
                 publishProgress(++progress);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -44,7 +47,11 @@ public class FileDownloadTask extends AsyncTask<String, Integer, Void> {
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
         if (listener != null) {
-            listener.onProgress(values[0], totalTasks);
+            try {
+                listener.onProgress(downloadedFile, values[0], totalTasks);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

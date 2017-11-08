@@ -3,7 +3,7 @@ package com.krishna.fileloader.builder;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.krishna.fileloader.FileDownloadTask;
+import com.krishna.fileloader.MultiFileDownloadTask;
 import com.krishna.fileloader.FileLoader;
 import com.krishna.fileloader.listener.MultiFileDownloadListener;
 
@@ -35,6 +35,6 @@ public class MultiFileDownloader {
     }
 
     public void loadMultiple(String... uris) {
-        new FileDownloadTask(context, directoryName, directoryType, listener).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uris);
+        new MultiFileDownloadTask(context, directoryName, directoryType, listener).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uris);
     }
 }
