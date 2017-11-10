@@ -176,14 +176,17 @@ public class FileLoader {
     private void callFailureMethodsOfListeners(Throwable t) {
         if (!requestListenersMap.isEmpty()) {
             synchronized (REQUEST_LISTENER_QUEUE_LOCK) {
-                for (FileRequestListener listener : requestListenersMap.get(fileLoadRequest)) {
-                    try {
-                        listener.onError(fileLoadRequest, t);
-                    } catch (Exception e) {
-                        //ignore
+                List<FileRequestListener> listenerList = requestListenersMap.get(fileLoadRequest);
+                if (listenerList != null) {
+                    for (FileRequestListener listener : listenerList) {
+                        try {
+                            listener.onError(fileLoadRequest, t);
+                        } catch (Exception e) {
+                            //ignore
+                        }
                     }
+                    requestListenersMap.remove(fileLoadRequest);
                 }
-                requestListenersMap.remove(fileLoadRequest);
             }
             synchronized (REQUEST_QUEUE_LOCK) {
                 fileLoadRequestSet.remove(fileLoadRequest);
@@ -210,14 +213,17 @@ public class FileLoader {
         if (!requestListenersMap.isEmpty()) {
             FileResponse fileResponse = createFileResponse(loadedFile);
             synchronized (REQUEST_LISTENER_QUEUE_LOCK) {
-                for (FileRequestListener listener : requestListenersMap.get(fileLoadRequest)) {
-                    try {
-                        listener.onLoad(fileLoadRequest, fileResponse);
-                    } catch (Exception e) {
-                        callFailureMethodsOfListeners(e);
+                List<FileRequestListener> listenerList = requestListenersMap.get(fileLoadRequest);
+                if (listenerList != null) {
+                    for (FileRequestListener listener : listenerList) {
+                        try {
+                            listener.onLoad(fileLoadRequest, fileResponse);
+                        } catch (Exception e) {
+                            callFailureMethodsOfListeners(e);
+                        }
                     }
+                    requestListenersMap.remove(fileLoadRequest);
                 }
-                requestListenersMap.remove(fileLoadRequest);
             }
             synchronized (REQUEST_QUEUE_LOCK) {
                 fileLoadRequestSet.remove(fileLoadRequest);
