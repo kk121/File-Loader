@@ -79,7 +79,7 @@ public class FileLoader {
 
     public FileResponse loadFile() throws Exception {
         validateAllParameters();
-        DownloadResponse response = getFileLoaderAsyncTask().execute().get();
+        DownloadResponse response = getFileLoaderAsyncTask().executeOnExecutor(Utils.getThreadPoolExecutor()).get();
         if (response.getDownloadedFile() != null) {
             return createFileResponse(response.getDownloadedFile());
         } else {
@@ -102,7 +102,7 @@ public class FileLoader {
             synchronized (REQUEST_QUEUE_LOCK) {
                 fileLoadRequestSet.add(fileLoadRequest);
             }
-            getFileLoaderAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            getFileLoaderAsyncTask().executeOnExecutor(Utils.getThreadPoolExecutor());
         }
     }
 

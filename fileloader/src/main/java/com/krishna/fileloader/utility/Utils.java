@@ -6,6 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by krishna on 15/10/17.
@@ -34,5 +38,13 @@ public class Utils {
         Object object = in.readObject();
         in.close();
         return object;
+    }
+
+    public static ThreadPoolExecutor getThreadPoolExecutor() {
+        int mCorePoolSize = 60;
+        int mMaximumPoolSize = 80;
+        int mKeepAliveTime = 30;
+        BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(mMaximumPoolSize);
+        return new ThreadPoolExecutor(mCorePoolSize, mMaximumPoolSize, mKeepAliveTime, TimeUnit.SECONDS, workQueue);
     }
 }
