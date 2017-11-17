@@ -24,7 +24,7 @@ public class FileDownloader {
     private String uri;
     private String dirName;
     private int dirType;
-    private OkHttpClient httpClient;
+    private static OkHttpClient httpClient;
     private Context context;
 
     public FileDownloader(Context context, String uri, String dirName, int dirType) {
@@ -32,15 +32,20 @@ public class FileDownloader {
         this.uri = uri;
         this.dirName = dirName;
         this.dirType = dirType;
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        initHttpClient();
+    }
 
-        if (BuildConfig.DEBUG)
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        else
-            interceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
-        this.httpClient = new OkHttpClient.Builder()
-                .addInterceptor(interceptor)
-                .build();
+    private void initHttpClient() {
+        if (httpClient == null) {
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            if (BuildConfig.DEBUG)
+                interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            else
+                interceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+            httpClient = new OkHttpClient.Builder()
+                    .addInterceptor(interceptor)
+                    .build();
+        }
     }
 
     @WorkerThread

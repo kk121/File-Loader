@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 
 import com.krishna.fileloader.listener.MultiFileDownloadListener;
 import com.krishna.fileloader.network.FileDownloader;
+import com.krishna.fileloader.request.MultiFileLoadRequest;
 import com.krishna.fileloader.utility.AndroidFileManager;
 
 import java.io.File;
@@ -15,19 +16,15 @@ import java.util.List;
  * Created by krishna on 17/10/17.
  */
 
-public class MultiFileDownloadTask extends AsyncTask<String, Integer, Void> {
+public class MultiFileDownloadTask extends AsyncTask<MultiFileLoadRequest, Integer, Void> {
     private MultiFileDownloadListener listener;
-    private String dirName;
-    private int dirType;
     private Context context;
     private int totalTasks = 0;
     private int progress = 0;
     private List<File> downloadedFiles;
     private boolean forceLoadFromNetwork;
 
-    public MultiFileDownloadTask(Context context, String dirName, int dirType, MultiFileDownloadListener listener, boolean forceLoadFromNetwork) {
-        this.dirName = dirName;
-        this.dirType = dirType;
+    public MultiFileDownloadTask(Context context, MultiFileDownloadListener listener, boolean forceLoadFromNetwork) {
         this.context = context.getApplicationContext();
         this.listener = listener;
         this.forceLoadFromNetwork = forceLoadFromNetwork;
@@ -35,17 +32,17 @@ public class MultiFileDownloadTask extends AsyncTask<String, Integer, Void> {
     }
 
     @Override
-    protected Void doInBackground(String... urls) {
-        totalTasks = urls.length;
-        for (String url : urls) {
+    protected Void doInBackground(MultiFileLoadRequest... requests) {
+        totalTasks = requests.length;
+        for (MultiFileLoadRequest loadRequest : requests) {
             try {
                 File downloadedFile = null;
                 if (!forceLoadFromNetwork) {
                     //search file locally
-                    downloadedFile = AndroidFileManager.searchAndGetLocalFile(context, url, dirName, dirType);
+                    downloadedFile = AndroidFileManager.searchAndGetLocalFile(context, loadRequest.getUri(), loadRequest.getDirectoryName(), loadRequest.getDirectoryType());
                 }
                 if (downloadedFile == null || !downloadedFile.exists()) {
-                    FileDownloader downloader = new FileDownloader(context, url, dirName, dirType);
+                    FileDownloader downloader = new FileDownloader(context, loadRequest.getUri(), loadRequest.getDirectoryName(), loadRequest.getDirectoryType());
                     downloadedFile = downloader.download();
                 }
                 downloadedFiles.add(downloadedFile);

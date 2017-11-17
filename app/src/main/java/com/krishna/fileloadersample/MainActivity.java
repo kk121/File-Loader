@@ -15,8 +15,11 @@ import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.listener.MultiFileDownloadListener;
 import com.krishna.fileloader.pojo.FileResponse;
 import com.krishna.fileloader.request.FileLoadRequest;
+import com.krishna.fileloader.request.MultiFileLoadRequest;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -75,14 +78,18 @@ public class MainActivity extends AppCompatActivity {
         //delete all files from directory except files passed in argument
         FileLoader.deleteWith(this).fromDirectory("test3", FileLoader.DIR_INTERNAL).deleteAllFilesExcept(uris);
 
-        FileLoader.multiFileDownload(this).fromDirectory("test4", FileLoader.DIR_INTERNAL)
+        List<MultiFileLoadRequest> multiFileLoadRequests = new ArrayList<>();
+        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[0], "test2", FileLoader.DIR_INTERNAL, true));
+        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], "test4", FileLoader.DIR_INTERNAL, true));
+
+        FileLoader.multiFileDownload(this)
                 .progressListener(new MultiFileDownloadListener() {
                     @Override
                     public void onProgress(File downloadedFile, int progress, int totalFiles) {
                         tvProgress.setText(progress + " of " + totalFiles);
                         Glide.with(MainActivity.this).load(downloadedFile).into(iv);
                     }
-                }).loadMultiple(true, uris);
+                }).loadMultiple(multiFileLoadRequests, true);
     }
 
     private void loadImage(final ImageView iv, String imageUrl) {
