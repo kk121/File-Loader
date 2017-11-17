@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.krishna.fileloader.FileLoader;
+import com.krishna.fileloader.builder.MultiFileDownloader;
 import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.listener.MultiFileDownloadListener;
 import com.krishna.fileloader.pojo.FileResponse;
@@ -82,14 +83,15 @@ public class MainActivity extends AppCompatActivity {
         multiFileLoadRequests.add(new MultiFileLoadRequest(uris[0], "test2", FileLoader.DIR_INTERNAL, true));
         multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], "test4", FileLoader.DIR_INTERNAL, true));
 
-        FileLoader.multiFileDownload(this)
-                .progressListener(new MultiFileDownloadListener() {
-                    @Override
-                    public void onProgress(File downloadedFile, int progress, int totalFiles) {
-                        tvProgress.setText(progress + " of " + totalFiles);
-                        Glide.with(MainActivity.this).load(downloadedFile).into(iv);
-                    }
-                }).loadMultiple(multiFileLoadRequests, true);
+        final MultiFileDownloader multiFileDownloader = FileLoader.multiFileDownload(this);
+        multiFileDownloader.progressListener(new MultiFileDownloadListener() {
+            @Override
+            public void onProgress(File downloadedFile, int progress, int totalFiles) {
+                multiFileDownloader.cancelLoad();
+                tvProgress.setText(progress + " of " + totalFiles);
+                Glide.with(MainActivity.this).load(downloadedFile).into(iv);
+            }
+        }).loadMultiple(multiFileLoadRequests);
     }
 
     private void loadImage(final ImageView iv, String imageUrl) {

@@ -22,12 +22,10 @@ public class MultiFileDownloadTask extends AsyncTask<MultiFileLoadRequest, Integ
     private int totalTasks = 0;
     private int progress = 0;
     private List<File> downloadedFiles;
-    private boolean forceLoadFromNetwork;
 
-    public MultiFileDownloadTask(Context context, MultiFileDownloadListener listener, boolean forceLoadFromNetwork) {
+    public MultiFileDownloadTask(Context context, MultiFileDownloadListener listener) {
         this.context = context.getApplicationContext();
         this.listener = listener;
-        this.forceLoadFromNetwork = forceLoadFromNetwork;
         downloadedFiles = new ArrayList<>();
     }
 
@@ -37,7 +35,7 @@ public class MultiFileDownloadTask extends AsyncTask<MultiFileLoadRequest, Integ
         for (MultiFileLoadRequest loadRequest : requests) {
             try {
                 File downloadedFile = null;
-                if (!forceLoadFromNetwork) {
+                if (!loadRequest.isForceLoadFromNetwork()) {
                     //search file locally
                     downloadedFile = AndroidFileManager.searchAndGetLocalFile(context, loadRequest.getUri(), loadRequest.getDirectoryName(), loadRequest.getDirectoryType());
                 }

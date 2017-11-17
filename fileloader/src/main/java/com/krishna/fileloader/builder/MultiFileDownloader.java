@@ -21,6 +21,7 @@ public class MultiFileDownloader {
 
     private MultiFileDownloadListener listener;
     private boolean forceLoadFromNetwork;
+    private MultiFileDownloadTask multiFileDownloadTask;
 
     public MultiFileDownloader(Context context) {
         this.context = context;
@@ -43,7 +44,8 @@ public class MultiFileDownloader {
             MultiFileLoadRequest loadRequest = new MultiFileLoadRequest(uris[i], directoryName, directoryType, forceLoadFromNetwork);
             loadRequestArr[i] = loadRequest;
         }
-        new MultiFileDownloadTask(context, listener, forceLoadFromNetwork).executeOnExecutor(Utils.getThreadPoolExecutor(), loadRequestArr);
+        multiFileDownloadTask = new MultiFileDownloadTask(context, listener);
+        multiFileDownloadTask.executeOnExecutor(Utils.getThreadPoolExecutor(), loadRequestArr);
     }
 
     public void loadMultiple(boolean forceLoadFromNetwork, String... uris) {
@@ -56,11 +58,12 @@ public class MultiFileDownloader {
         for (int i = 0; i < multiFileLoadRequestList.size(); i++) {
             loadRequestArr[i] = multiFileLoadRequestList.get(i);
         }
-        new MultiFileDownloadTask(context, listener, forceLoadFromNetwork).executeOnExecutor(Utils.getThreadPoolExecutor(), loadRequestArr);
+        multiFileDownloadTask = new MultiFileDownloadTask(context, listener);
+        multiFileDownloadTask.executeOnExecutor(Utils.getThreadPoolExecutor(), loadRequestArr);
     }
 
-    public void loadMultiple(List<MultiFileLoadRequest> multiFileLoadRequestList, boolean forceLoadFromNetwork) {
-        this.forceLoadFromNetwork = forceLoadFromNetwork;
-        loadMultiple(multiFileLoadRequestList);
+    public void cancelLoad() {
+        if (multiFileDownloadTask != null)
+            multiFileDownloadTask.cancel(true);
     }
 }
