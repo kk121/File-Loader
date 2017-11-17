@@ -27,15 +27,17 @@ public class FileLoadRequest {
     private int fileType;
     private String fileExtension = FileExtension.UNKNOWN;
     private Class requestClass;
+    private boolean forceLoadFromNetwork;
     private FileRequestListener requestListener;
 
-    public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, FileRequestListener listener) {
+    public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, boolean forceLoadFromNetwork, FileRequestListener listener) {
         this.uri = uri;
         this.directoryName = directoryName;
         this.directoryType = directoryType;
         this.fileType = fileType;
         this.requestClass = requestClass;
         this.fileExtension = fileExtension;
+        this.forceLoadFromNetwork = forceLoadFromNetwork;
         this.requestListener = listener;
     }
 
@@ -99,6 +101,14 @@ public class FileLoadRequest {
 
     public void setFileExtension(String fileExtension) {
         this.fileExtension = fileExtension;
+    }
+
+    public boolean isForceLoadFromNetwork() {
+        return forceLoadFromNetwork;
+    }
+
+    public void setForceLoadFromNetwork(boolean forceLoadFromNetwork) {
+        this.forceLoadFromNetwork = forceLoadFromNetwork;
     }
 
     @Override

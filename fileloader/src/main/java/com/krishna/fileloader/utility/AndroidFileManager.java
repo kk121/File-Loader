@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.text.TextUtils;
 
 import com.krishna.fileloader.FileLoader;
 
@@ -12,6 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by krishna on 12/10/17.
@@ -19,13 +22,24 @@ import java.io.InputStreamReader;
 
 public class AndroidFileManager {
 
-    public static File getFileForRequest(Context context, String fileUri, String dirName, int dirType) {
+    public static File getFileForRequest(Context context, String fileUri, String dirName, int dirType) throws Exception {
         String fileName = getFileName(fileUri);
         return new File(getAppropriateDirectory(context, dirName, dirType), fileName);
     }
 
-    public static String getFileName(String url) {
-        return String.valueOf(url.hashCode());
+    public static String getFileName(String uri) throws Exception {
+        String fileName;
+        try {
+            //passed uri is valid url, create file name as hashcode of url
+            new URL(uri);
+            fileName = String.valueOf(uri.hashCode());
+        } catch (MalformedURLException e) {
+            if (uri.contains("/"))
+                throw new Exception("File name should not contain path separator \"/\"");
+            //passed uri is name of the file
+            fileName = uri;
+        }
+        return fileName;
     }
 
     public static File getAppropriateDirectory(Context context, String directoryName, int directoryType) {
@@ -92,9 +106,28 @@ public class AndroidFileManager {
         return BitmapFactory.decodeFile(downloadedFile.getPath());
     }
 
-    public static void deleteFile(Context context, String fileUri, String dirName, @FileLoader.DirectoryType int dirType) {
+    public static void deleteFile(Context context, String fileUri, String dirName, @FileLoader.DirectoryType int dirType) throws Exception {
         File fileToDelete = getFileForRequest(context, fileUri, dirName, dirType);
         if (fileToDelete.exists())
             fileToDelete.delete();
+    }
+
+    public static File searchAndGetLocalFile(Context context, String uri, String dirName, @FileLoader.DirectoryType int dirType) throws Exception {
+        File foundFile = null;
+        if (!TextUtils.isEmpty(dirName)) {
+            File dir = AndroidFileManager.getAppropriateDirectory(context, dirName, dirType);
+            if (dir != null && dir.exists()) {
+                File[] allFiles = dir.listFiles();
+                if (allFiles != null) {
+                    for (File file : allFiles) {
+                        if (!file.isDirectory() && file.getName().equals(getFileName(uri))) {
+                            foundFile = file;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return foundFile;
     }
 }

@@ -20,8 +20,6 @@ import com.krishna.fileloader.utility.AndroidFileManager;
 import com.krishna.fileloader.utility.Utils;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -106,7 +104,7 @@ public class FileLoader {
         }
     }
 
-    public int deleteFiles() {
+    public int deleteFiles() throws Exception {
         int fileCount = 0;
         for (String fileUri : fileDeleteRequest.getFileUriList()) {
             File file = AndroidFileManager.getFileForRequest(context, fileUri, fileDeleteRequest.getDirectoryName(), fileDeleteRequest.getDirectoryType());
@@ -136,7 +134,7 @@ public class FileLoader {
         Set<String> filesToKeepSet = new HashSet<>();
         for (String fileUri : fileDeleteRequest.getFileUriList()) {
             try {
-                filesToKeepSet.add(getFileName(fileUri));
+                filesToKeepSet.add(AndroidFileManager.getFileName(fileUri));
             } catch (Exception e) {
                 //ignore
             }
@@ -231,51 +229,19 @@ public class FileLoader {
         }
     }
 
-    private File searchAndGetLocalFile() throws Exception {
-        validateAllParameters();
-        File foundFile = null;
-        if (!TextUtils.isEmpty(fileLoadRequest.getDirectoryName())) {
-            File dir = AndroidFileManager.getAppropriateDirectory(context, fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
-            if (dir != null && dir.exists()) {
-                File[] allFiles = dir.listFiles();
-                if (allFiles != null) {
-                    for (File file : allFiles) {
-                        if (!file.isDirectory() && file.getName().equals(getFileName(fileLoadRequest.getUri()))) {
-                            foundFile = file;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return foundFile;
-    }
-
-    private String getFileName(String uri) throws Exception {
-        String fileName;
-        try {
-            //passed uri is valid url, create file name as hashcode of url
-            new URL(uri);
-            fileName = String.valueOf(uri.hashCode());
-        } catch (MalformedURLException e) {
-            if (uri.contains("/"))
-                throw new Exception("File name should not contain path separator \"/\"");
-            //passed uri is name of the file
-            fileName = uri;
-        }
-        return fileName;
-    }
-
     @NonNull
     private AsyncTask<Void, Void, DownloadResponse> getFileLoaderAsyncTask() {
         return new AsyncTask<Void, Void, DownloadResponse>() {
             @Override
             protected DownloadResponse doInBackground(Void... voids) {
                 DownloadResponse downloadResponse = new DownloadResponse();
-                File loadedFile;
+                File loadedFile = null;
                 try {
-                    //search file locally
-                    loadedFile = searchAndGetLocalFile();
+                    if (!fileLoadRequest.isForceLoadFromNetwork()) {
+                        //search file locally
+                        loadedFile = AndroidFileManager.searchAndGetLocalFile(context, fileLoadRequest.getUri(),
+                                fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
+                    }
                     if (loadedFile == null || !loadedFile.exists()) {
                         //download from internet
                         FileDownloader downloader = new FileDownloader(context, fileLoadRequest.getUri(), fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());

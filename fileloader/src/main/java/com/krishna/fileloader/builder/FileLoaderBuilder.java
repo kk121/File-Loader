@@ -27,6 +27,7 @@ public class FileLoaderBuilder {
     private int returnFileType;
     private Class requestClass;
     private FileLoader fileLoader;
+    private boolean forceLoadFromNetwork;
 
 
     public FileLoaderBuilder(Context context) {
@@ -36,6 +37,11 @@ public class FileLoaderBuilder {
     public FileLoaderBuilder load(String uri) {
         this.uri = uri;
         return this;
+    }
+
+    public FileLoaderBuilder load(String uri, boolean forceLoadFromNetwork) {
+        this.forceLoadFromNetwork = forceLoadFromNetwork;
+        return load(uri);
     }
 
     public FileLoaderBuilder fromDirectory(String directoryName, @FileLoader.DirectoryType int directoryType) {
@@ -99,6 +105,6 @@ public class FileLoaderBuilder {
 
     private void buildFileLoader() {
         fileLoader = new FileLoader(context);
-        fileLoader.setFileLoadRequest(new FileLoadRequest(uri, directoryName, directoryType, returnFileType, requestClass, fileExtension, listener));
+        fileLoader.setFileLoadRequest(new FileLoadRequest(uri, directoryName, directoryType, returnFileType, requestClass, fileExtension, forceLoadFromNetwork, listener));
     }
 }

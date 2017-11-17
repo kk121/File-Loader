@@ -7,6 +7,7 @@ import com.krishna.fileloader.request.FileDeleteRequest;
 import com.krishna.fileloader.FileLoader;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,11 +32,9 @@ public class FileDeleteBuilder {
         return this;
     }
 
-    public int deleteFiles(String... fileUris) {
+    public int deleteFiles(String... fileUris) throws Exception {
         fileUriList = new ArrayList<>();
-        for (String fileUri : fileUris) {
-            fileUriList.add(fileUri);
-        }
+        fileUriList.addAll(Arrays.asList(fileUris));
         fileLoader = buildFileLoader();
         return fileLoader.deleteFiles();
     }
@@ -48,7 +47,7 @@ public class FileDeleteBuilder {
         return fileLoader;
     }
 
-    public int deleteFiles(ArrayList<String> fileUriList) {
+    public int deleteFiles(ArrayList<String> fileUriList) throws Exception {
         return deleteFiles((String[]) fileUriList.toArray());
     }
 

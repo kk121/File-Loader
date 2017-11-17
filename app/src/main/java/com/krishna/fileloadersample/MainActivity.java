@@ -63,7 +63,11 @@ public class MainActivity extends AppCompatActivity {
         final String[] uris = {"https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg",
                 "https://upload.wikimedia.org/wikipedia/commons/3/3c/Enrique_Simonet_-_Marina_veneciana_6MB.jpg"};
         //delete files
-        FileLoader.deleteWith(this).fromDirectory("test2", FileLoader.DIR_INTERNAL).deleteFiles(uris);
+        try {
+            FileLoader.deleteWith(this).fromDirectory("test2", FileLoader.DIR_INTERNAL).deleteFiles(uris);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //delete all files from the directory
         FileLoader.deleteWith(this).fromDirectory("test2", FileLoader.DIR_INTERNAL).deleteAllFiles();
@@ -78,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                         tvProgress.setText(progress + " of " + totalFiles);
                         Glide.with(MainActivity.this).load(downloadedFile).into(iv);
                     }
-                }).loadMultiple(uris);
+                }).loadMultiple(true, uris);
     }
 
     private void loadImage(final ImageView iv, String imageUrl) {
