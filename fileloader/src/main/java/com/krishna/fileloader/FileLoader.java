@@ -86,6 +86,7 @@ public class FileLoader {
     }
 
     public void loadFileAsync() {
+        addRequestListenerToQueue();
         try {
             validateAllParameters();
             if (fileLoadRequest.getRequestListener() == null)
@@ -95,7 +96,6 @@ public class FileLoader {
             return;
         }
         // All parameters are valid, move to next step
-        addRequestListenerToQueue();
         if (!fileLoadRequestSet.contains(fileLoadRequest)) {
             synchronized (REQUEST_QUEUE_LOCK) {
                 fileLoadRequestSet.add(fileLoadRequest);
