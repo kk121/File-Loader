@@ -263,7 +263,7 @@ public class FileLoader {
 
                 //if task is asynchronous, notify results to listeners
                 File downloadedFile = downloadResponse.getDownloadedFile();
-                if (downloadedFile != null) {
+                if (downloadedFile != null && downloadResponse.getE() == null) {
                     sendFileResponseToListeners(downloadedFile);
                 } else {
                     callFailureMethodsOfListeners(downloadResponse.getE());

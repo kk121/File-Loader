@@ -9,6 +9,7 @@ import com.krishna.fileloader.request.MultiFileLoadRequest;
 import com.krishna.fileloader.utility.AndroidFileManager;
 
 import java.io.File;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +46,10 @@ public class MultiFileDownloadTask extends AsyncTask<MultiFileLoadRequest, Integ
                 }
                 downloadedFiles.add(downloadedFile);
                 publishProgress(++progress);
+            } catch (InterruptedIOException e) {
+                sendErrorToListener(e, ++progress);
             } catch (Exception e) {
-                e.printStackTrace();
+                sendErrorToListener(e, ++progress);
             }
         }
         return null;
@@ -59,12 +62,16 @@ public class MultiFileDownloadTask extends AsyncTask<MultiFileLoadRequest, Integ
             try {
                 listener.onProgress(downloadedFiles.get(values[0] - 1), values[0], totalTasks);
             } catch (Exception e) {
-                try {
-                    listener.onError(e, values[0]);
-                } catch (Exception e1) {
-                    //ignore
-                }
+                sendErrorToListener(e, values[0]);
             }
+        }
+    }
+
+    private void sendErrorToListener(Exception e, int progress) {
+        try {
+            listener.onError(e, progress);
+        } catch (Exception e1) {
+            //ignore
         }
     }
 }

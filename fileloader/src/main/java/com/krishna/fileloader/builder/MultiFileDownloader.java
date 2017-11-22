@@ -53,7 +53,8 @@ public class MultiFileDownloader {
         loadMultiple(uris);
     }
 
-    public void loadMultiple(List<MultiFileLoadRequest> multiFileLoadRequestList) {
+    public void loadMultiple(boolean forceLoadFromNetwork, List<MultiFileLoadRequest> multiFileLoadRequestList) {
+        this.forceLoadFromNetwork = forceLoadFromNetwork;
         MultiFileLoadRequest[] loadRequestArr = new MultiFileLoadRequest[multiFileLoadRequestList.size()];
         for (int i = 0; i < multiFileLoadRequestList.size(); i++) {
             loadRequestArr[i] = multiFileLoadRequestList.get(i);

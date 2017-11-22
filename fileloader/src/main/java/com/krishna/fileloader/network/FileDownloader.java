@@ -8,6 +8,7 @@ import com.krishna.fileloader.utility.AndroidFileManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,6 +44,9 @@ public class FileDownloader {
             else
                 interceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
             httpClient = new OkHttpClient.Builder()
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .writeTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
                     .addInterceptor(interceptor)
                     .build();
         }
