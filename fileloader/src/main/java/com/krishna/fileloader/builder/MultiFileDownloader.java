@@ -63,6 +63,10 @@ public class MultiFileDownloader {
         multiFileDownloadTask.executeOnExecutor(Utils.getThreadPoolExecutor(), loadRequestArr);
     }
 
+    public void loadMultiple(List<MultiFileLoadRequest> multiFileLoadRequestList) {
+        loadMultiple(false, multiFileLoadRequestList);
+    }
+
     public void cancelLoad() {
         if (multiFileDownloadTask != null)
             multiFileDownloadTask.cancel(true);
