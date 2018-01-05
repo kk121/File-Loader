@@ -1,5 +1,7 @@
 # File Loader
+[![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-File%20Loader-green.svg?style=flat )]( https://android-arsenal.com/details/1/6638 ) 
 
+<br>
 Android library for downloading, saving/caching and retrieving any type of files ( image, video, pdf, apk etc ) easily.
 
 ## Download
