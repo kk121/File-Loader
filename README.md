@@ -62,6 +62,10 @@ FileLoader.with(this)
 ```
 ### Load multiple files with progress update listener ( load all from same directory ):
 ```sh
+final String[] uris = {"https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg",
+                "https://upload.wikimedia.org/wikipedia/commons/3/3c/Enrique_Simonet_-_Marina_veneciana_6MB.jpg",
+                "https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2017/01/Google-acquires-Fabric.png"};
+                
 FileLoader.multiFileDownload(this)
                 .fromDirectory("test2", FileLoader.DIR_INTERNAL)
                 .progressListener(new MultiFileDownloadListener() {
