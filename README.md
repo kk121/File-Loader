@@ -1,5 +1,5 @@
 # File Loader
-[![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-File%20Loader-green.svg?style=flat )]( https://android-arsenal.com/details/1/6638 ) 
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-File%20Loader-green.svg?style=flat )](https://android-arsenal.com/details/1/6638)  [![Jitpack](https://jitpack.io/v/kk121/File-Loader.svg)](https://jitpack.io/#kk121/File-Loader)
 
 <br>
 Android library for downloading, saving/caching and retrieving any type of files ( image, video, pdf, apk etc ) easily.
@@ -13,7 +13,7 @@ repositories {
 }
     
 dependencies {
-    implementation 'com.github.kk121:File-Loader:db95d5dafa'
+    implementation 'com.github.kk121:File-Loader:1.1'
 }
 ```
 ### Maven:
