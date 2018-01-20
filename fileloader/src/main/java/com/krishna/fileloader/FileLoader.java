@@ -116,7 +116,7 @@ public class FileLoader {
         return fileCount;
     }
 
-    public int deleteAllFiles() {
+    public int deleteAllFiles() throws Exception {
         int fileCount = 0;
         File dir = AndroidFileManager.getAppropriateDirectory(context, fileDeleteRequest.getDirectoryName(), fileDeleteRequest.getDirectoryType());
         File[] allFiles = dir.listFiles();
@@ -128,7 +128,7 @@ public class FileLoader {
         return fileCount;
     }
 
-    public int deleteAllFilesExcept() {
+    public int deleteAllFilesExcept() throws Exception {
         int fileCount = 0;
         File dir = AndroidFileManager.getAppropriateDirectory(context, fileDeleteRequest.getDirectoryName(), fileDeleteRequest.getDirectoryType());
         Set<String> filesToKeepSet = new HashSet<>();

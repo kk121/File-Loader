@@ -36,12 +36,10 @@ public class MainActivity extends AppCompatActivity {
         //Asynchronously load file as generic file
         FileLoader.with(this)
                 .load("https://upload.wikimedia.org/wikipedia/commons/3/3c/Enrique_Simonet_-_Marina_veneciana_6MB.jpg")
-                .fromDirectory("test4", FileLoader.DIR_INTERNAL)
+                .fromDirectory("test4", FileLoader.DIR_EXTERNAL_PUBLIC)
                 .asFile(new FileRequestListener<File>() {
                     @Override
                     public void onLoad(FileLoadRequest request, FileResponse<File> response) {
-                        Bitmap bitmap = BitmapFactory.decodeFile(response.getDownloadedFile().getPath());
-//                        iv.setImageBitmap(bitmap);
                         Glide.with(MainActivity.this).load(response.getBody()).into(iv);
                     }
 
@@ -74,20 +72,28 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //delete all files from the directory
-        FileLoader.deleteWith(this).fromDirectory("test2", FileLoader.DIR_INTERNAL).deleteAllFiles();
+        try {
+            FileLoader.deleteWith(this).fromDirectory("test2", FileLoader.DIR_INTERNAL).deleteAllFiles();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //delete all files from directory except files passed in argument
-        FileLoader.deleteWith(this).fromDirectory("test3", FileLoader.DIR_INTERNAL).deleteAllFilesExcept(uris);
+        try {
+            FileLoader.deleteWith(this).fromDirectory("test3", FileLoader.DIR_INTERNAL).deleteAllFilesExcept(uris);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         List<MultiFileLoadRequest> multiFileLoadRequests = new ArrayList<>();
-        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[0], "test2", FileLoader.DIR_INTERNAL, true));
-        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], "test4", FileLoader.DIR_INTERNAL, true));
+        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[0], "test2", FileLoader.DIR_EXTERNAL_PUBLIC, true));
+        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], "test4", FileLoader.DIR_EXTERNAL_PUBLIC, true));
 
         final MultiFileDownloader multiFileDownloader = FileLoader.multiFileDownload(this);
         multiFileDownloader.progressListener(new MultiFileDownloadListener() {
             @Override
             public void onProgress(File downloadedFile, int progress, int totalFiles) {
-                multiFileDownloader.cancelLoad();
+//                multiFileDownloader.cancelLoad();
                 tvProgress.setText(progress + " of " + totalFiles);
                 Glide.with(MainActivity.this).load(downloadedFile).into(iv);
             }

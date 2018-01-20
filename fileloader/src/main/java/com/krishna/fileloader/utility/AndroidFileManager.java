@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.krishna.fileloader.FileLoader;
@@ -42,19 +43,17 @@ public class AndroidFileManager {
         return fileName;
     }
 
-    public static File getAppropriateDirectory(Context context, String directoryName, int directoryType) {
-        File file;
+    public static File getAppropriateDirectory(Context context, String directoryName, int directoryType) throws Exception {
+        File file = null;
         switch (directoryType) {
             case FileLoader.DIR_CACHE:
                 file = new File(context.getCacheDir(), directoryName);
                 break;
             case FileLoader.DIR_EXTERNAL_PRIVATE:
-                // TODO: 12/10/17 check if dir is readable/writable
-                file = new File(context.getExternalFilesDir(null), directoryName);
+                file = getExternalPrivateDirectory(context, directoryName);
                 break;
             case FileLoader.DIR_EXTERNAL_PUBLIC:
-                // TODO: 12/10/17 check if dir is readable/writable
-                file = new File(Environment.getExternalStoragePublicDirectory(null), directoryName);
+                file = getExternalPublicDirectory(directoryName);
                 break;
             default:
                 //by default take internal directory
@@ -66,23 +65,48 @@ public class AndroidFileManager {
         return file;
     }
 
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
+    @NonNull
+    private static File getExternalPublicDirectory(String directoryName) throws Exception {
+        File file;
+        if (isExternalStorageWritable()) {
+            File rootDir = Environment.getExternalStorageDirectory();
+            if (rootDir == null) {
+                file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), directoryName);
+            } else {
+                file = new File(rootDir, directoryName);
+            }
+        } else {
+            throw new Exception("External storage is not available for write operation");
         }
-        return false;
+        return file;
+    }
+
+    private static File getExternalPrivateDirectory(Context context, String directoryName) throws Exception {
+        String baseDir = null;
+        if (isExternalStorageWritable()) {
+            File baseDirFile = context.getExternalFilesDir(null);
+            if (baseDirFile == null) {
+                baseDir = context.getFilesDir().getAbsolutePath();
+            } else {
+                baseDir = baseDirFile.getAbsolutePath();
+            }
+        } else {
+            throw new Exception("External storage is not available for write operation");
+        }
+        return new File(baseDir, directoryName);
+    }
+
+    /* Checks if external storage is available for read and write */
+    private static boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     /* Checks if external storage is available to at least read */
     public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
 
     public static String readFileAsString(File file) {

@@ -51,12 +51,12 @@ public class FileDeleteBuilder {
         return deleteFiles((String[]) fileUriList.toArray());
     }
 
-    public int deleteAllFiles() {
+    public int deleteAllFiles() throws Exception {
         fileLoader = buildFileLoader();
         return fileLoader.deleteAllFiles();
     }
 
-    public int deleteAllFilesExcept(String... fileUris) {
+    public int deleteAllFilesExcept(String... fileUris) throws Exception {
         fileUriList = new ArrayList<>();
         for (String fileUri : fileUris) {
             fileUriList.add(fileUri);
@@ -65,7 +65,7 @@ public class FileDeleteBuilder {
         return fileLoader.deleteAllFilesExcept();
     }
 
-    public int deleteAllFilesExcept(List<String> fileUriList) {
+    public int deleteAllFilesExcept(List<String> fileUriList) throws Exception {
         return deleteAllFilesExcept((String[]) fileUriList.toArray());
     }
 }
