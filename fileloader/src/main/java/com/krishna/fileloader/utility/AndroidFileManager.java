@@ -32,13 +32,31 @@ public class AndroidFileManager {
         String fileName;
         try {
             //passed uri is valid url, create file name as hashcode of url
-            new URL(uri);
-            fileName = String.valueOf(uri.hashCode());
+            URL url = new URL(uri);
+            fileName = getFileNameFromUrl(url);
+            if (fileName == null) {
+                fileName = String.valueOf(uri.hashCode());
+            }
         } catch (MalformedURLException e) {
             if (uri.contains("/"))
                 throw new Exception("File name should not contain path separator \"/\"");
             //passed uri is name of the file
             fileName = uri;
+        }
+        return fileName;
+    }
+
+    private static String getFileNameFromUrl(URL url) {
+        String fileName = null;
+        String path = url.getPath();
+        if (path != null) {
+            String pathArr[] = path.split("/");
+            if (pathArr.length > 0) {
+                String lastPath = pathArr[pathArr.length - 1];
+                if (Utils.isValidFileName(lastPath)) {
+                    fileName = lastPath;
+                }
+            }
         }
         return fileName;
     }

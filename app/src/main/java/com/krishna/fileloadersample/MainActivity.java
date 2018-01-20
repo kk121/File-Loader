@@ -3,6 +3,7 @@ package com.krishna.fileloadersample;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
@@ -49,12 +50,17 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+        /*try {
+            FileLoader.deleteWith(this).fromDirectory("test4", FileLoader.DIR_EXTERNAL_PUBLIC).deleteAllFiles();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
 
         //Synchronous json file loading
         try {
             FileResponse response = FileLoader.with(this)
                     .load("http://echo.jsontest.com/key1/value1/key2/value2")
-                    .fromDirectory("test3", FileLoader.DIR_INTERNAL)
+                    .fromDirectory("test4", FileLoader.DIR_EXTERNAL_PUBLIC)
                     .asObject(JsonTest.class);
             JsonTest test = (JsonTest) response.getBody();
             Log.d(TAG, "" + test);
@@ -62,32 +68,33 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
         final String[] uris = {"https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg",
                 "https://upload.wikimedia.org/wikipedia/commons/3/3c/Enrique_Simonet_-_Marina_veneciana_6MB.jpg"};
         //delete files
-        try {
-            FileLoader.deleteWith(this).fromDirectory("test2", FileLoader.DIR_INTERNAL).deleteFiles(uris);
+       /* try {
+            FileLoader.deleteWith(this).fromDirectory("test4", FileLoader.DIR_EXTERNAL_PUBLIC).deleteFiles(uris);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         //delete all files from the directory
         try {
-            FileLoader.deleteWith(this).fromDirectory("test2", FileLoader.DIR_INTERNAL).deleteAllFiles();
+            FileLoader.deleteWith(this).fromDirectory("test4", FileLoader.DIR_EXTERNAL_PUBLIC).deleteAllFiles();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         //delete all files from directory except files passed in argument
         try {
-            FileLoader.deleteWith(this).fromDirectory("test3", FileLoader.DIR_INTERNAL).deleteAllFilesExcept(uris);
+            FileLoader.deleteWith(this).fromDirectory("test4", FileLoader.DIR_INTERNAL).deleteAllFilesExcept(uris);
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
         List<MultiFileLoadRequest> multiFileLoadRequests = new ArrayList<>();
-        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[0], "test2", FileLoader.DIR_EXTERNAL_PUBLIC, true));
-        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], "test4", FileLoader.DIR_EXTERNAL_PUBLIC, true));
+        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[0], Environment.DIRECTORY_PICTURES, FileLoader.DIR_EXTERNAL_PUBLIC, true));
+        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], Environment.DIRECTORY_PICTURES, FileLoader.DIR_EXTERNAL_PUBLIC, true));
 
         final MultiFileDownloader multiFileDownloader = FileLoader.multiFileDownload(this);
         multiFileDownloader.progressListener(new MultiFileDownloadListener() {

@@ -23,12 +23,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.github.bumptech.glide:glide:4.1.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.1.1'
-
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
     compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
     testCompile 'junit:junit:4.12'
-    compile project(':fileloader')
+//    compile 'com.github.kk121:File-Loader:1.1'
+    implementation project(':fileloader')
 }

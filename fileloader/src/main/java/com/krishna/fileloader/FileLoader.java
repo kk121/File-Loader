@@ -36,13 +36,13 @@ import java.util.WeakHashMap;
 public class FileLoader {
     private static final String TAG = "FileLoader";
     // Directory type
-    public static final int DIR_INTERNAL = 1;
-    public static final int DIR_CACHE = 2;
-    public static final int DIR_EXTERNAL_PRIVATE = 3;
-    public static final int DIR_EXTERNAL_PUBLIC = 4;
+    public static final int DIR_INTERNAL = 1; //Only your app can access. { android FilesDir() }
+    public static final int DIR_CACHE = 2; // Only your app can access, can be deleted by system. { android CacheDir() }
+    public static final int DIR_EXTERNAL_PRIVATE = 3; //Accessible by all apps but not by users. { android ExternalFilesDir() }
+    public static final int DIR_EXTERNAL_PUBLIC = 4; //Accessible by all apps and users. { android ExternalStorageDirectory() }
 
     //Defaults
-    public static final int DEFAULT_DIR_TYPE = DIR_INTERNAL;
+    public static final int DEFAULT_DIR_TYPE = DIR_CACHE;
     public static final String DEFAULT_DIR_NAME = "file_loader";
 
     @IntDef({DIR_INTERNAL, DIR_CACHE, DIR_EXTERNAL_PRIVATE, DIR_EXTERNAL_PUBLIC})

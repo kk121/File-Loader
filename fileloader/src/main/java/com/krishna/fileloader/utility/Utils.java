@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
  * Created by krishna on 15/10/17.
@@ -46,5 +47,10 @@ public class Utils {
         int mKeepAliveTime = 30;
         BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(mMaximumPoolSize);
         return new ThreadPoolExecutor(mCorePoolSize, mMaximumPoolSize, mKeepAliveTime, TimeUnit.SECONDS, workQueue);
+    }
+
+    public static boolean isValidFileName(String fileName) {
+        Pattern pattern = Pattern.compile(".*\\..*");
+        return pattern.matcher(fileName).matches();
     }
 }
