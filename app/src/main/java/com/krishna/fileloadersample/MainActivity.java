@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         }*/
 
         List<MultiFileLoadRequest> multiFileLoadRequests = new ArrayList<>();
-        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[0], Environment.DIRECTORY_PICTURES, FileLoader.DIR_EXTERNAL_PUBLIC, true));
+        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[0], Environment.DIRECTORY_DOWNLOADS, FileLoader.DIR_EXTERNAL_PRIVATE, true));
         multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], Environment.DIRECTORY_PICTURES, FileLoader.DIR_EXTERNAL_PUBLIC, true));
 
         final MultiFileDownloader multiFileDownloader = FileLoader.multiFileDownload(this);

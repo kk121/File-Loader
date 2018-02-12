@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +53,7 @@ public class FileLoader {
     private static Map<FileLoadRequest, Boolean> backingMap = new WeakHashMap<>();
     private static Set<FileLoadRequest> fileLoadRequestSet = Collections.newSetFromMap(backingMap);
     private static Map<FileLoadRequest, List<FileRequestListener>> requestListenersMap = new WeakHashMap<>();
+    private static Map<FileLoadRequest, FileResponse> requestResponseMap = new WeakHashMap<>();
     private static final Object REQUEST_QUEUE_LOCK = new Object();
     private static final Object REQUEST_LISTENER_QUEUE_LOCK = new Object();
 
@@ -101,6 +103,8 @@ public class FileLoader {
                 fileLoadRequestSet.add(fileLoadRequest);
             }
             getFileLoaderAsyncTask().executeOnExecutor(Utils.getThreadPoolExecutor());
+        } else if (requestResponseMap.get(fileLoadRequest) != null) {
+            sendFileResponseToListeners(requestResponseMap.get(fileLoadRequest));
         }
     }
 
@@ -176,8 +180,11 @@ public class FileLoader {
             synchronized (REQUEST_LISTENER_QUEUE_LOCK) {
                 List<FileRequestListener> listenerList = requestListenersMap.get(fileLoadRequest);
                 if (listenerList != null) {
-                    for (FileRequestListener listener : listenerList) {
+                    Iterator<FileRequestListener> it = listenerList.iterator();
+                    while (it.hasNext()) {
                         try {
+                            FileRequestListener listener = it.next();
+                            it.remove();
                             listener.onError(fileLoadRequest, t);
                         } catch (Exception e) {
                             //ignore
@@ -207,14 +214,16 @@ public class FileLoader {
         return response;
     }
 
-    private void sendFileResponseToListeners(File loadedFile) {
+    private void sendFileResponseToListeners(FileResponse fileResponse) {
         if (!requestListenersMap.isEmpty()) {
-            FileResponse fileResponse = createFileResponse(loadedFile);
             synchronized (REQUEST_LISTENER_QUEUE_LOCK) {
                 List<FileRequestListener> listenerList = requestListenersMap.get(fileLoadRequest);
                 if (listenerList != null) {
-                    for (FileRequestListener listener : listenerList) {
+                    Iterator<FileRequestListener> it = listenerList.iterator();
+                    while (it.hasNext()) {
                         try {
+                            FileRequestListener listener = it.next();
+                            it.remove();
                             listener.onLoad(fileLoadRequest, fileResponse);
                         } catch (Exception e) {
                             callFailureMethodsOfListeners(e);
@@ -225,6 +234,7 @@ public class FileLoader {
             }
             synchronized (REQUEST_QUEUE_LOCK) {
                 fileLoadRequestSet.remove(fileLoadRequest);
+                requestResponseMap.remove(fileLoadRequest);
             }
         }
     }
@@ -264,7 +274,9 @@ public class FileLoader {
                 //if task is asynchronous, notify results to listeners
                 File downloadedFile = downloadResponse.getDownloadedFile();
                 if (downloadedFile != null && downloadResponse.getE() == null) {
-                    sendFileResponseToListeners(downloadedFile);
+                    FileResponse fileResponse = createFileResponse(downloadedFile);
+                    requestResponseMap.put(fileLoadRequest, fileResponse);
+                    sendFileResponseToListeners(fileResponse);
                 } else {
                     callFailureMethodsOfListeners(downloadResponse.getE());
                 }
