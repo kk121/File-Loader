@@ -13,7 +13,7 @@ repositories {
 }
     
 dependencies {
-    implementation 'com.github.kk121:File-Loader:1.1'
+    implementation 'com.github.kk121:File-Loader:1.2'
 }
 ```
 ### Maven:
@@ -21,7 +21,7 @@ dependencies {
 <dependency>
   <groupId>com.github.kk121</groupId>
   <artifactId>File-Loader</artifactId>
-  <version>db95d5dafa</version>
+  <version>1.2</version>
 </dependency>
 ```
 ## How do I use File Loader?
@@ -67,7 +67,7 @@ final String[] uris = {"https://images.pexels.com/photos/45170/kittens-cat-cat-p
                 "https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2017/01/Google-acquires-Fabric.png"};
                 
 FileLoader.multiFileDownload(this)
-                .fromDirectory("test2", FileLoader.DIR_INTERNAL)
+                .fromDirectory(Environment.DIRECTORY_PICTURES, FileLoader.DIR_EXTERNAL_PUBLIC)
                 .progressListener(new MultiFileDownloadListener() {
                     @Override
                     public void onProgress(File downloadedFile, int progress, int totalFiles) {
@@ -83,9 +83,8 @@ FileLoader.multiFileDownload(this)
 ```sh
 List<MultiFileLoadRequest> multiFileLoadRequests = new ArrayList<>();
         multiFileLoadRequests.add(new MultiFileLoadRequest(uris[0], "test2", FileLoader.DIR_INTERNAL, false));
-        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], "test4", FileLoader.DIR_INTERNAL, false));
-        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[2], "test4", FileLoader.DIR_INTERNAL, false));
-        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[3], "test4", FileLoader.DIR_INTERNAL, false));
+        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], Environment.DIRECTORY_DOWNLOADS, FileLoader.DIR_EXTERNAL_PRIVATE, false));
+        multiFileLoadRequests.add(new MultiFileLoadRequest(uris[2], Environment.DIRECTORY_PICTURES, FileLoader.DIR_EXTERNAL_PUBLIC, false));
         
 MultiFileDownloader multiFileDownloader = FileLoader.multiFileDownload(this);
 multiFileDownloader.progressListener(new MultiFileDownloadListener() {
