@@ -9,12 +9,12 @@ public class MultiFileLoadRequest {
     private String directoryName;
     private int directoryType;
     private boolean forceLoadFromNetwork;
+    private boolean autoRefresh;
 
     /**
-     *
-     * @param uri Url of the image to download (ex. https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg)
-     * @param directoryName Name of the directory where you want to download (like. Environment.DIRECTORY_PICTURES , Environment.DIRECTORY_DOCUMENTS, Environment.DIRECTORY_DOWNLOADS or custom directory "My Directory"
-     * @param directoryType Type of directory {@link com.krishna.fileloader.FileLoader.DirectoryType}
+     * @param uri                  Url of the image to download (ex. https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg)
+     * @param directoryName        Name of the directory where you want to download (like. Environment.DIRECTORY_PICTURES , Environment.DIRECTORY_DOCUMENTS, Environment.DIRECTORY_DOWNLOADS or custom directory "My Directory"
+     * @param directoryType        Type of directory {@link com.krishna.fileloader.FileLoader.DirectoryType}
      * @param forceLoadFromNetwork if true, it will ignore the local file if exists and re-download else returns the existing file
      */
     public MultiFileLoadRequest(String uri, String directoryName, int directoryType, boolean forceLoadFromNetwork) {
@@ -54,5 +54,13 @@ public class MultiFileLoadRequest {
 
     public void setForceLoadFromNetwork(boolean forceLoadFromNetwork) {
         this.forceLoadFromNetwork = forceLoadFromNetwork;
+    }
+
+    public boolean isAutoRefresh() {
+        return autoRefresh;
+    }
+
+    public void setAutoRefresh(boolean autoRefresh) {
+        this.autoRefresh = autoRefresh;
     }
 }

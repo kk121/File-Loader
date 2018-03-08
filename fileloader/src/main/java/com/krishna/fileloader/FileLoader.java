@@ -69,12 +69,20 @@ public class FileLoader {
         return new FileLoaderBuilder(context);
     }
 
+    public static FileLoaderBuilder with(Context context, boolean autoRefresh) {
+        return new FileLoaderBuilder(context, autoRefresh);
+    }
+
     public static FileDeleteBuilder deleteWith(Context context) {
         return new FileDeleteBuilder(context);
     }
 
     public static MultiFileDownloader multiFileDownload(Context context) {
         return new MultiFileDownloader(context);
+    }
+
+    public static MultiFileDownloader multiFileDownload(Context context, boolean autoRefresh) {
+        return new MultiFileDownloader(context, autoRefresh);
     }
 
     public FileResponse loadFile() throws Exception {
@@ -255,7 +263,7 @@ public class FileLoader {
                     if (loadedFile == null || !loadedFile.exists()) {
                         //download from internet
                         FileDownloader downloader = new FileDownloader(context, fileLoadRequest.getUri(), fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
-                        loadedFile = downloader.download();
+                        loadedFile = downloader.download(fileLoadRequest.isAutoRefresh());
                     }
                     downloadResponse.setDownloadedFile(loadedFile);
                 } catch (Exception e) {

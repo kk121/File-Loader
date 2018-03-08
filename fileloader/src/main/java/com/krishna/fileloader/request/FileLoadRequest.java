@@ -28,6 +28,7 @@ public class FileLoadRequest {
     private String fileExtension = FileExtension.UNKNOWN;
     private Class requestClass;
     private boolean forceLoadFromNetwork;
+    private boolean autoRefresh;
     private FileRequestListener requestListener;
 
     public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, boolean forceLoadFromNetwork, FileRequestListener listener) {
@@ -39,6 +40,11 @@ public class FileLoadRequest {
         this.fileExtension = fileExtension;
         this.forceLoadFromNetwork = forceLoadFromNetwork;
         this.requestListener = listener;
+    }
+
+    public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, boolean forceLoadFromNetwork, boolean autoRefresh, FileRequestListener listener) {
+        this(uri, directoryName, directoryType, fileType, requestClass, fileExtension, forceLoadFromNetwork, listener);
+        this.autoRefresh = autoRefresh;
     }
 
     public FileLoadRequest(String uri, String directoryName, int directoryType) {
@@ -109,6 +115,14 @@ public class FileLoadRequest {
 
     public void setForceLoadFromNetwork(boolean forceLoadFromNetwork) {
         this.forceLoadFromNetwork = forceLoadFromNetwork;
+    }
+
+    public boolean isAutoRefresh() {
+        return autoRefresh;
+    }
+
+    public void setAutoRefresh(boolean autoRefresh) {
+        this.autoRefresh = autoRefresh;
     }
 
     @Override

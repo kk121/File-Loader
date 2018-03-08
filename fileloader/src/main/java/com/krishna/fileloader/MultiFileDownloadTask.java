@@ -35,14 +35,15 @@ public class MultiFileDownloadTask extends AsyncTask<MultiFileLoadRequest, Integ
         totalTasks = requests.length;
         for (MultiFileLoadRequest loadRequest : requests) {
             try {
-                File downloadedFile = null;
-                if (!loadRequest.isForceLoadFromNetwork()) {
-                    //search file locally
-                    downloadedFile = AndroidFileManager.searchAndGetLocalFile(context, loadRequest.getUri(), loadRequest.getDirectoryName(), loadRequest.getDirectoryType());
-                }
-                if (downloadedFile == null || !downloadedFile.exists()) {
-                    FileDownloader downloader = new FileDownloader(context, loadRequest.getUri(), loadRequest.getDirectoryName(), loadRequest.getDirectoryType());
-                    downloadedFile = downloader.download();
+                File downloadedFile = AndroidFileManager.searchAndGetLocalFile(context, loadRequest.getUri(), loadRequest.getDirectoryName(), loadRequest.getDirectoryType());
+                FileDownloader downloader = new FileDownloader(context, loadRequest.getUri(), loadRequest.getDirectoryName(), loadRequest.getDirectoryType());
+                if (loadRequest.isForceLoadFromNetwork() || downloadedFile == null || !downloadedFile.exists()) {
+                    downloadedFile = downloader.download(false);
+                } else if (loadRequest.isAutoRefresh()) {
+                    File tempFile = downloader.download(true);
+                    if (tempFile != null) {
+                        downloadedFile = tempFile;
+                    }
                 }
                 downloadedFiles.add(downloadedFile);
                 publishProgress(++progress);

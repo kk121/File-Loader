@@ -5,6 +5,7 @@ import android.support.annotation.WorkerThread;
 
 import com.krishna.fileloader.BuildConfig;
 import com.krishna.fileloader.utility.AndroidFileManager;
+import com.krishna.fileloader.utility.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,20 +54,47 @@ public class FileDownloader {
     }
 
     @WorkerThread
-    public File download() throws Exception {
-        Request request = new Request.Builder().url(uri).build();
+    public File download(boolean autoRefresh) throws Exception {
+        Request.Builder requestBuilder = new Request.Builder().url(uri);
+
+        //if auto-refresh is enabled then add header "If-Modified-Since" to the request and send last modified time of local file
+        File downloadFilePath = AndroidFileManager.getFileForRequest(context, uri, dirName, dirType);
+        if (autoRefresh) {
+            String lastModifiedTime = Utils.getLastModifiedTime(downloadFilePath.lastModified());
+            if (lastModifiedTime != null) {
+                requestBuilder.addHeader("If-Modified-Since", lastModifiedTime);
+            }
+        }
+
+        Request request = requestBuilder.build();
         Response response = httpClient.newCall(request).execute();
+
+        //if file on server is not modified, return null.
+        if (autoRefresh && response.code() == 304) {
+            return null;
+        }
+
         if (!response.isSuccessful() || response.body() == null) {
             throw new IOException("Failed to download file: " + response);
         }
-        File downloadedFile = AndroidFileManager.getFileForRequest(context, uri, dirName, dirType);
-        if (downloadedFile.exists()) {
-            if (downloadedFile.delete())
-                downloadedFile = AndroidFileManager.getFileForRequest(context, uri, dirName, dirType);
+
+        //if file already exists, delete it
+        if (downloadFilePath.exists()) {
+            if (downloadFilePath.delete())
+                downloadFilePath = AndroidFileManager.getFileForRequest(context, uri, dirName, dirType);
         }
-        BufferedSink sink = Okio.buffer(Okio.sink(downloadedFile));
+
+        //write the body to file
+        BufferedSink sink = Okio.buffer(Okio.sink(downloadFilePath));
         sink.writeAll(response.body().source());
         sink.close();
-        return downloadedFile;
+
+        //set server Last-Modified time to file. send this time to server on next request.
+        long timeStamp = Utils.parseLastModifiedHeader(response.header("Last-Modified"));
+        if (timeStamp > 0) {
+            downloadFilePath.setLastModified(timeStamp);
+        }
+
+        return downloadFilePath;
     }
 }

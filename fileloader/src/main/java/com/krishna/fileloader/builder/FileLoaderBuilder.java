@@ -28,10 +28,16 @@ public class FileLoaderBuilder {
     private Class requestClass;
     private FileLoader fileLoader;
     private boolean forceLoadFromNetwork;
+    private boolean autoRefresh;
 
 
     public FileLoaderBuilder(Context context) {
         this.context = context;
+    }
+
+    public FileLoaderBuilder(Context context, boolean autoRefresh) {
+        this.context = context;
+        this.autoRefresh = autoRefresh;
     }
 
     public FileLoaderBuilder load(String uri) {
@@ -105,6 +111,6 @@ public class FileLoaderBuilder {
 
     private void buildFileLoader() {
         fileLoader = new FileLoader(context);
-        fileLoader.setFileLoadRequest(new FileLoadRequest(uri, directoryName, directoryType, returnFileType, requestClass, fileExtension, forceLoadFromNetwork, listener));
+        fileLoader.setFileLoadRequest(new FileLoadRequest(uri, directoryName, directoryType, returnFileType, requestClass, fileExtension, forceLoadFromNetwork, autoRefresh, listener));
     }
 }
