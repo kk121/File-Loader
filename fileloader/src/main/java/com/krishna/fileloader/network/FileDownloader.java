@@ -89,6 +89,13 @@ public class FileDownloader {
         sink.writeAll(response.body().source());
         sink.close();
 
+        //check if downloaded file is not corrupt
+        if (downloadFilePath.length() < response.body().contentLength()) {
+            //delete the corrupt file
+            downloadFilePath.delete();
+            throw new IOException("Failed to download file: " + response);
+        }
+
         //set server Last-Modified time to file. send this time to server on next request.
         long timeStamp = Utils.parseLastModifiedHeader(response.header("Last-Modified"));
         if (timeStamp > 0) {
