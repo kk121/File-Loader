@@ -2,9 +2,12 @@ package com.krishna.fileloader.network;
 
 import android.content.Context;
 import android.support.annotation.WorkerThread;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.krishna.fileloader.BuildConfig;
 import com.krishna.fileloader.utility.AndroidFileManager;
+import com.krishna.fileloader.utility.MD5;
 import com.krishna.fileloader.utility.Utils;
 
 import java.io.File;
@@ -23,6 +26,7 @@ import okio.Okio;
  */
 
 public class FileDownloader {
+    private static final String TAG = "FileDownloader";
     private String uri;
     private String dirName;
     private int dirType;
@@ -54,7 +58,7 @@ public class FileDownloader {
     }
 
     @WorkerThread
-    public File download(boolean autoRefresh) throws Exception {
+    public File download(boolean autoRefresh, boolean checkIntegrity) throws Exception {
         Request.Builder requestBuilder = new Request.Builder().url(uri);
 
         //if auto-refresh is enabled then add header "If-Modified-Since" to the request and send last modified time of local file
@@ -90,10 +94,29 @@ public class FileDownloader {
         sink.close();
 
         //check if downloaded file is not corrupt
-        if (readBytes < response.body().contentLength()) {
+        int contentLength = 0;
+        try {
+            contentLength = Integer.parseInt(response.header("Content-Length", ""));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        if (readBytes < contentLength) {
             //delete the corrupt file
             downloadFilePath.delete();
+            Log.i(TAG, "downloaded file is corrupt: " + request.url());
             throw new IOException("Failed to download file: " + response);
+        }
+
+        if (checkIntegrity) {
+            String eTag = response.header("ETag", "").replaceAll("\"", "").trim();
+            if (!TextUtils.isEmpty(eTag)) {
+                if (!MD5.checkMD5(eTag, downloadFilePath)) {
+                    //delete the corrupt file
+                    downloadFilePath.delete();
+                    Log.i(TAG, "checksum did not match: " + request.url());
+                    throw new IOException("Failed to download file: " + response);
+                }
+            }
         }
 
         //set server Last-Modified time to file. send this time to server on next request.

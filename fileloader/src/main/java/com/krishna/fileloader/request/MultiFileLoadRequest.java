@@ -10,6 +10,7 @@ public class MultiFileLoadRequest {
     private int directoryType;
     private boolean forceLoadFromNetwork;
     private boolean autoRefresh;
+    private boolean checkIntegrity;
 
     /**
      * @param uri                  Url of the image to download (ex. https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg)
@@ -62,5 +63,13 @@ public class MultiFileLoadRequest {
 
     public void setAutoRefresh(boolean autoRefresh) {
         this.autoRefresh = autoRefresh;
+    }
+
+    public boolean isCheckIntegrity() {
+        return checkIntegrity;
+    }
+
+    public void setCheckIntegrity(boolean checkIntegrity) {
+        this.checkIntegrity = checkIntegrity;
     }
 }

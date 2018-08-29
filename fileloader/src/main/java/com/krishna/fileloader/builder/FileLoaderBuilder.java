@@ -29,6 +29,7 @@ public class FileLoaderBuilder {
     private FileLoader fileLoader;
     private boolean forceLoadFromNetwork;
     private boolean autoRefresh;
+    private boolean checkIntegrity;
 
 
     public FileLoaderBuilder(Context context) {
@@ -53,6 +54,11 @@ public class FileLoaderBuilder {
     public FileLoaderBuilder fromDirectory(String directoryName, @FileLoader.DirectoryType int directoryType) {
         this.directoryName = directoryName;
         this.directoryType = directoryType;
+        return this;
+    }
+
+    public FileLoaderBuilder checkFileintegrity(boolean checkIntegrity) {
+        this.checkIntegrity = checkIntegrity;
         return this;
     }
 
@@ -111,6 +117,6 @@ public class FileLoaderBuilder {
 
     private void buildFileLoader() {
         fileLoader = new FileLoader(context);
-        fileLoader.setFileLoadRequest(new FileLoadRequest(uri, directoryName, directoryType, returnFileType, requestClass, fileExtension, forceLoadFromNetwork, autoRefresh, listener));
+        fileLoader.setFileLoadRequest(new FileLoadRequest(uri, directoryName, directoryType, returnFileType, requestClass, fileExtension, forceLoadFromNetwork, autoRefresh, checkIntegrity, listener));
     }
 }

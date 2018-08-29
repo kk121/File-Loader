@@ -263,7 +263,7 @@ public class FileLoader {
                     if (loadedFile == null || !loadedFile.exists()) {
                         //download from internet
                         FileDownloader downloader = new FileDownloader(context, fileLoadRequest.getUri(), fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
-                        loadedFile = downloader.download(fileLoadRequest.isAutoRefresh());
+                        loadedFile = downloader.download(fileLoadRequest.isAutoRefresh(), fileLoadRequest.isCheckIntegrity());
                     }
                     downloadResponse.setDownloadedFile(loadedFile);
                 } catch (Exception e) {

@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         //Asynchronously load file as generic file
         FileLoader.with(this)
                 .load("https://upload.wikimedia.org/wikipedia/commons/3/3c/Enrique_Simonet_-_Marina_veneciana_6MB.jpg")
+                .checkFileintegrity(true)
                 .fromDirectory("test4", FileLoader.DIR_EXTERNAL_PUBLIC)
                 .asFile(new FileRequestListener<File>() {
                     @Override
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             FileResponse response = FileLoader.with(this)
                     .load("http://echo.jsontest.com/key1/value1/key2/value2")
                     .fromDirectory("test4", FileLoader.DIR_EXTERNAL_PUBLIC)
+                    .checkFileintegrity(true)
                     .asObject(JsonTest.class);
             JsonTest test = (JsonTest) response.getBody();
             Log.d(TAG, "" + test);
@@ -97,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         multiFileLoadRequests.add(new MultiFileLoadRequest(uris[1], Environment.DIRECTORY_PICTURES, FileLoader.DIR_EXTERNAL_PUBLIC, true));
 
         final MultiFileDownloader multiFileDownloader = FileLoader.multiFileDownload(this);
+        multiFileDownloader.checkFileintegrity(true);
         multiFileDownloader.progressListener(new MultiFileDownloadListener() {
             @Override
             public void onProgress(File downloadedFile, int progress, int totalFiles) {

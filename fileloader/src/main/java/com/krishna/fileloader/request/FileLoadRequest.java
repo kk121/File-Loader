@@ -29,6 +29,7 @@ public class FileLoadRequest {
     private Class requestClass;
     private boolean forceLoadFromNetwork;
     private boolean autoRefresh;
+    private boolean checkIntegrity;
     private FileRequestListener requestListener;
 
     public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, boolean forceLoadFromNetwork, FileRequestListener listener) {
@@ -42,9 +43,10 @@ public class FileLoadRequest {
         this.requestListener = listener;
     }
 
-    public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, boolean forceLoadFromNetwork, boolean autoRefresh, FileRequestListener listener) {
+    public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, boolean forceLoadFromNetwork, boolean autoRefresh, boolean checkIntegrity, FileRequestListener listener) {
         this(uri, directoryName, directoryType, fileType, requestClass, fileExtension, forceLoadFromNetwork, listener);
         this.autoRefresh = autoRefresh;
+        this.checkIntegrity = checkIntegrity;
     }
 
     public FileLoadRequest(String uri, String directoryName, int directoryType) {
@@ -123,6 +125,14 @@ public class FileLoadRequest {
 
     public void setAutoRefresh(boolean autoRefresh) {
         this.autoRefresh = autoRefresh;
+    }
+
+    public boolean isCheckIntegrity() {
+        return checkIntegrity;
+    }
+
+    public void setCheckIntegrity(boolean checkIntegrity) {
+        this.checkIntegrity = checkIntegrity;
     }
 
     @Override
