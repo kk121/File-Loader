@@ -90,8 +90,15 @@ public class FileDownloader {
 
         //write the body to file
         BufferedSink sink = Okio.buffer(Okio.sink(downloadFilePath));
-        long readBytes = sink.writeAll(response.body().source());
-        sink.close();
+        long readBytes;
+        try {
+            readBytes = sink.writeAll(response.body().source());
+            sink.close();
+        } catch (IOException e) {
+            if (downloadFilePath.exists())
+                downloadFilePath.delete();
+            throw new IOException("Failed to download file: " + response);
+        }
 
         //check if downloaded file is not corrupt
         int contentLength = 0;
