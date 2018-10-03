@@ -36,6 +36,9 @@ import java.util.WeakHashMap;
 
 public class FileLoader {
     private static final String TAG = "FileLoader";
+    public static final int STATUS_START_LOCAL_SEARCH = 100;
+    public static final int STATUS_START_DOWNLOADING = 101;
+    public static final int STATUS_DOWNLOAD_END = 102;
     // Directory type
     public static final int DIR_INTERNAL = 1; //Only your app can access. { android FilesDir() }
     public static final int DIR_CACHE = 2; // Only your app can access, can be deleted by system. { android CacheDir() }
@@ -247,9 +250,30 @@ public class FileLoader {
         }
     }
 
+    private void sendStatusToListeners(int status) {
+        if (!requestListenersMap.isEmpty()) {
+            synchronized (REQUEST_LISTENER_QUEUE_LOCK) {
+                List<FileRequestListener> listenerList = requestListenersMap.get(fileLoadRequest);
+                if (listenerList != null) {
+                    for (FileRequestListener listener : listenerList) {
+                        listener.onStatusChange(status);
+                    }
+                }
+            }
+        }
+    }
+
     @NonNull
-    private AsyncTask<Void, Void, DownloadResponse> getFileLoaderAsyncTask() {
-        return new AsyncTask<Void, Void, DownloadResponse>() {
+    private AsyncTask<Void, Integer, DownloadResponse> getFileLoaderAsyncTask() {
+        return new AsyncTask<Void, Integer, DownloadResponse>() {
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+                if (values.length > 0)
+                    sendStatusToListeners(values[0]);
+            }
+
             @Override
             protected DownloadResponse doInBackground(Void... voids) {
                 DownloadResponse downloadResponse = new DownloadResponse();
@@ -257,13 +281,16 @@ public class FileLoader {
                 try {
                     if (!fileLoadRequest.isForceLoadFromNetwork()) {
                         //search file locally
+                        publishProgress(STATUS_START_LOCAL_SEARCH);
                         loadedFile = AndroidFileManager.searchAndGetLocalFile(context, fileLoadRequest.getUri(),
                                 fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
                     }
-                    if (loadedFile == null || !loadedFile.exists()) {
+                    if (loadedFile == null || !loadedFile.exists() || fileLoadRequest.isAutoRefresh()) {
                         //download from internet
+                        publishProgress(STATUS_START_DOWNLOADING);
                         FileDownloader downloader = new FileDownloader(context, fileLoadRequest.getUri(), fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
                         loadedFile = downloader.download(fileLoadRequest.isAutoRefresh(), fileLoadRequest.isCheckIntegrity());
+                        publishProgress(STATUS_DOWNLOAD_END);
                     }
                     downloadResponse.setDownloadedFile(loadedFile);
                 } catch (Exception e) {

@@ -7,8 +7,12 @@ import com.krishna.fileloader.pojo.FileResponse;
  * Created by krishna on 12/10/17.
  */
 
-public interface FileRequestListener<T> {
-    void onLoad(FileLoadRequest request, FileResponse<T> response);
+public abstract class FileRequestListener<T> {
+    public void onStatusChange(int status) {
 
-    void onError(FileLoadRequest request, Throwable t);
+    }
+
+    public abstract void onLoad(FileLoadRequest request, FileResponse<T> response);
+
+    public abstract void onError(FileLoadRequest request, Throwable t);
 }

@@ -75,7 +75,7 @@ public class FileDownloader {
 
         //if file on server is not modified, return null.
         if (autoRefresh && response.code() == 304) {
-            return null;
+            return downloadFilePath;
         }
 
         if (!response.isSuccessful() || response.body() == null) {
