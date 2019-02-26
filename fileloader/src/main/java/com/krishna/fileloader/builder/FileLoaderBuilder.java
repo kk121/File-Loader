@@ -30,6 +30,7 @@ public class FileLoaderBuilder {
     private boolean forceLoadFromNetwork;
     private boolean autoRefresh;
     private boolean checkIntegrity;
+    private String fileNamePrefix = "";
 
 
     public FileLoaderBuilder(Context context) {
@@ -49,6 +50,10 @@ public class FileLoaderBuilder {
     public FileLoaderBuilder load(String uri, boolean forceLoadFromNetwork) {
         this.forceLoadFromNetwork = forceLoadFromNetwork;
         return load(uri);
+    }
+
+    public void setFileNamePrefix(String fileNamePrefix) {
+        this.fileNamePrefix = fileNamePrefix;
     }
 
     public FileLoaderBuilder fromDirectory(String directoryName, @FileLoader.DirectoryType int directoryType) {
@@ -117,6 +122,6 @@ public class FileLoaderBuilder {
 
     private void buildFileLoader() {
         fileLoader = new FileLoader(context);
-        fileLoader.setFileLoadRequest(new FileLoadRequest(uri, directoryName, directoryType, returnFileType, requestClass, fileExtension, forceLoadFromNetwork, autoRefresh, checkIntegrity, listener));
+        fileLoader.setFileLoadRequest(new FileLoadRequest(uri, directoryName, directoryType, returnFileType, requestClass, fileExtension, forceLoadFromNetwork, autoRefresh, checkIntegrity, listener, fileNamePrefix));
     }
 }

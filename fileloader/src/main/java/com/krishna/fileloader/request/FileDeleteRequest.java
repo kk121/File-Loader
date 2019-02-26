@@ -10,6 +10,7 @@ public class FileDeleteRequest {
     private ArrayList<String> fileUriList;
     private String directoryName;
     private int directoryType;
+    private String fileNamePrefix = "";
 
     public FileDeleteRequest(ArrayList<String> fileUriList, String directoryName, int directoryType) {
         this.fileUriList = fileUriList;
@@ -39,5 +40,13 @@ public class FileDeleteRequest {
 
     public void setDirectoryType(int directoryType) {
         this.directoryType = directoryType;
+    }
+
+    public String getFileNamePrefix() {
+        return fileNamePrefix;
+    }
+
+    public void setFileNamePrefix(String fileNamePrefix) {
+        this.fileNamePrefix = fileNamePrefix;
     }
 }

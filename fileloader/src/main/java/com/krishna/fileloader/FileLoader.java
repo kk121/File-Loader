@@ -122,7 +122,7 @@ public class FileLoader {
     public int deleteFiles() throws Exception {
         int fileCount = 0;
         for (String fileUri : fileDeleteRequest.getFileUriList()) {
-            File file = AndroidFileManager.getFileForRequest(context, fileUri, fileDeleteRequest.getDirectoryName(), fileDeleteRequest.getDirectoryType());
+            File file = AndroidFileManager.getFileForRequest(context, fileUri, fileDeleteRequest.getFileNamePrefix(), fileDeleteRequest.getDirectoryName(), fileDeleteRequest.getDirectoryType());
             if (file.exists()) {
                 file.delete();
                 fileCount++;
@@ -149,7 +149,7 @@ public class FileLoader {
         Set<String> filesToKeepSet = new HashSet<>();
         for (String fileUri : fileDeleteRequest.getFileUriList()) {
             try {
-                filesToKeepSet.add(AndroidFileManager.getFileName(fileUri));
+                filesToKeepSet.add(AndroidFileManager.getFileName(fileUri, fileDeleteRequest.getFileNamePrefix()));
             } catch (Exception e) {
                 //ignore
             }
@@ -282,13 +282,13 @@ public class FileLoader {
                     if (!fileLoadRequest.isForceLoadFromNetwork()) {
                         //search file locally
                         publishProgress(STATUS_START_LOCAL_SEARCH);
-                        loadedFile = AndroidFileManager.searchAndGetLocalFile(context, fileLoadRequest.getUri(),
+                        loadedFile = AndroidFileManager.searchAndGetLocalFile(context, fileLoadRequest.getUri(), fileLoadRequest.getFileNamePrefix(),
                                 fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
                     }
                     if (loadedFile == null || !loadedFile.exists() || fileLoadRequest.isAutoRefresh()) {
                         //download from internet
                         publishProgress(STATUS_START_DOWNLOADING);
-                        FileDownloader downloader = new FileDownloader(context, fileLoadRequest.getUri(), fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
+                        FileDownloader downloader = new FileDownloader(context, fileLoadRequest.getUri(),fileLoadRequest.getFileNamePrefix(), fileLoadRequest.getDirectoryName(), fileLoadRequest.getDirectoryType());
                         loadedFile = downloader.download(fileLoadRequest.isAutoRefresh(), fileLoadRequest.isCheckIntegrity());
                         publishProgress(STATUS_DOWNLOAD_END);
                     }

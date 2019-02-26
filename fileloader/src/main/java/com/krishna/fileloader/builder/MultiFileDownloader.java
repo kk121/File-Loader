@@ -23,6 +23,7 @@ public class MultiFileDownloader {
     private boolean forceLoadFromNetwork;
     private boolean autoRefresh;
     private boolean checkIntegrity;
+    private String fileNamesPrefix = "";
     private MultiFileDownloadTask multiFileDownloadTask;
 
     public MultiFileDownloader(Context context) {
@@ -56,6 +57,7 @@ public class MultiFileDownloader {
             MultiFileLoadRequest loadRequest = new MultiFileLoadRequest(uris[i], directoryName, directoryType, forceLoadFromNetwork);
             loadRequest.setAutoRefresh(autoRefresh);
             loadRequest.setCheckIntegrity(checkIntegrity);
+            loadRequest.setFileNamePrefix(fileNamesPrefix);
             loadRequestArr[i] = loadRequest;
         }
         multiFileDownloadTask = new MultiFileDownloadTask(context, listener);
@@ -73,6 +75,7 @@ public class MultiFileDownloader {
         for (int i = 0; i < multiFileLoadRequestList.size(); i++) {
             loadRequestArr[i] = multiFileLoadRequestList.get(i);
             loadRequestArr[i].setAutoRefresh(autoRefresh);
+            loadRequestArr[i].setFileNamePrefix(fileNamesPrefix);
             loadRequestArr[i].setCheckIntegrity(checkIntegrity);
         }
         multiFileDownloadTask = new MultiFileDownloadTask(context, listener);
@@ -86,5 +89,9 @@ public class MultiFileDownloader {
     public void cancelLoad() {
         if (multiFileDownloadTask != null)
             multiFileDownloadTask.cancel(true);
+    }
+
+    public void setFileNamesPrefix(String fileNamesPrefix) {
+        this.fileNamesPrefix = fileNamesPrefix;
     }
 }

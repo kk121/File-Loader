@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
         final MultiFileDownloader multiFileDownloader = FileLoader.multiFileDownload(this);
         multiFileDownloader.checkFileintegrity(true);
+        multiFileDownloader.setFileNamesPrefix("1");
         multiFileDownloader.progressListener(new MultiFileDownloadListener() {
             @Override
             public void onProgress(File downloadedFile, int progress, int totalFiles) {

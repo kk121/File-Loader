@@ -32,12 +32,14 @@ public class FileDownloader {
     private int dirType;
     private static OkHttpClient httpClient;
     private Context context;
+    private String fileNamePrefix = "";
 
-    public FileDownloader(Context context, String uri, String dirName, int dirType) {
+    public FileDownloader(Context context, String uri, String fileNamePrefix, String dirName, int dirType) {
         this.context = context.getApplicationContext();
         this.uri = uri;
         this.dirName = dirName;
         this.dirType = dirType;
+        this.fileNamePrefix = fileNamePrefix;
         initHttpClient();
     }
 
@@ -62,7 +64,7 @@ public class FileDownloader {
         Request.Builder requestBuilder = new Request.Builder().url(uri);
 
         //if auto-refresh is enabled then add header "If-Modified-Since" to the request and send last modified time of local file
-        File downloadFilePath = AndroidFileManager.getFileForRequest(context, uri, dirName, dirType);
+        File downloadFilePath = AndroidFileManager.getFileForRequest(context, uri, fileNamePrefix, dirName, dirType);
         if (autoRefresh) {
             String lastModifiedTime = Utils.getLastModifiedTime(downloadFilePath.lastModified());
             if (lastModifiedTime != null) {
@@ -85,7 +87,7 @@ public class FileDownloader {
         //if file already exists, delete it
         if (downloadFilePath.exists()) {
             if (downloadFilePath.delete())
-                downloadFilePath = AndroidFileManager.getFileForRequest(context, uri, dirName, dirType);
+                downloadFilePath = AndroidFileManager.getFileForRequest(context, uri, fileNamePrefix, dirName, dirType);
         }
 
         //write the body to file

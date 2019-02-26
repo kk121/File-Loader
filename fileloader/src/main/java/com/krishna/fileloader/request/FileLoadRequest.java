@@ -30,6 +30,7 @@ public class FileLoadRequest {
     private boolean forceLoadFromNetwork;
     private boolean autoRefresh;
     private boolean checkIntegrity;
+    private String fileNamePrefix = "";
     private FileRequestListener requestListener;
 
     public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, boolean forceLoadFromNetwork, FileRequestListener listener) {
@@ -43,10 +44,11 @@ public class FileLoadRequest {
         this.requestListener = listener;
     }
 
-    public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, boolean forceLoadFromNetwork, boolean autoRefresh, boolean checkIntegrity, FileRequestListener listener) {
+    public FileLoadRequest(String uri, String directoryName, int directoryType, int fileType, Class requestClass, String fileExtension, boolean forceLoadFromNetwork, boolean autoRefresh, boolean checkIntegrity, FileRequestListener listener, String fileNamePrefix) {
         this(uri, directoryName, directoryType, fileType, requestClass, fileExtension, forceLoadFromNetwork, listener);
         this.autoRefresh = autoRefresh;
         this.checkIntegrity = checkIntegrity;
+        this.fileNamePrefix = fileNamePrefix;
     }
 
     public FileLoadRequest(String uri, String directoryName, int directoryType) {
@@ -133,6 +135,14 @@ public class FileLoadRequest {
 
     public void setCheckIntegrity(boolean checkIntegrity) {
         this.checkIntegrity = checkIntegrity;
+    }
+
+    public String getFileNamePrefix() {
+        return fileNamePrefix;
+    }
+
+    public void setFileNamePrefix(String fileNamePrefix) {
+        this.fileNamePrefix = fileNamePrefix;
     }
 
     @Override

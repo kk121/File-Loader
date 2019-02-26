@@ -11,6 +11,7 @@ public class MultiFileLoadRequest {
     private boolean forceLoadFromNetwork;
     private boolean autoRefresh;
     private boolean checkIntegrity;
+    private String fileNamePrefix;
 
     /**
      * @param uri                  Url of the image to download (ex. https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg)
@@ -19,10 +20,15 @@ public class MultiFileLoadRequest {
      * @param forceLoadFromNetwork if true, it will ignore the local file if exists and re-download else returns the existing file
      */
     public MultiFileLoadRequest(String uri, String directoryName, int directoryType, boolean forceLoadFromNetwork) {
+        this(uri, directoryName, directoryType, forceLoadFromNetwork, "");
+    }
+
+    public MultiFileLoadRequest(String uri, String directoryName, int directoryType, boolean forceLoadFromNetwork, String fileNamePrefix) {
         this.uri = uri;
         this.directoryName = directoryName;
         this.directoryType = directoryType;
         this.forceLoadFromNetwork = forceLoadFromNetwork;
+        this.fileNamePrefix = fileNamePrefix;
     }
 
     public String getUri() {
@@ -71,5 +77,13 @@ public class MultiFileLoadRequest {
 
     public void setCheckIntegrity(boolean checkIntegrity) {
         this.checkIntegrity = checkIntegrity;
+    }
+
+    public String getFileNamePrefix() {
+        return fileNamePrefix;
+    }
+
+    public void setFileNamePrefix(String fileNamePrefix) {
+        this.fileNamePrefix = fileNamePrefix;
     }
 }

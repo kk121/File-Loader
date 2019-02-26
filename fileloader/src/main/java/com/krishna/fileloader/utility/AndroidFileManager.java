@@ -23,12 +23,12 @@ import java.net.URL;
 
 public class AndroidFileManager {
 
-    public static File getFileForRequest(Context context, String fileUri, String dirName, int dirType) throws Exception {
-        String fileName = getFileName(fileUri);
+    public static File getFileForRequest(Context context, String fileUri, String fileNamePrefix, String dirName, int dirType) throws Exception {
+        String fileName = getFileName(fileUri, fileNamePrefix);
         return new File(getAppropriateDirectory(context, dirName, dirType), fileName);
     }
 
-    public static String getFileName(String uri) throws Exception {
+    public static String getFileName(String uri, String fileNamePrefix) throws Exception {
         String fileName;
         try {
             //passed uri is valid url, create file name as hashcode of url
@@ -43,7 +43,7 @@ public class AndroidFileManager {
             //passed uri is name of the file
             fileName = uri;
         }
-        return fileName;
+        return fileNamePrefix + fileName;
     }
 
     private static String getFileNameFromUrl(URL url) {
@@ -148,13 +148,13 @@ public class AndroidFileManager {
         return BitmapFactory.decodeFile(downloadedFile.getPath());
     }
 
-    public static void deleteFile(Context context, String fileUri, String dirName, @FileLoader.DirectoryType int dirType) throws Exception {
-        File fileToDelete = getFileForRequest(context, fileUri, dirName, dirType);
+    public static void deleteFile(Context context, String fileUri, String fileNamePrefix, String dirName, @FileLoader.DirectoryType int dirType) throws Exception {
+        File fileToDelete = getFileForRequest(context, fileUri, fileNamePrefix, dirName, dirType);
         if (fileToDelete.exists())
             fileToDelete.delete();
     }
 
-    public static File searchAndGetLocalFile(Context context, String uri, String dirName, @FileLoader.DirectoryType int dirType) throws Exception {
+    public static File searchAndGetLocalFile(Context context, String uri, String fileNamePrefix, String dirName, @FileLoader.DirectoryType int dirType) throws Exception {
         File foundFile = null;
         if (!TextUtils.isEmpty(dirName)) {
             File dir = AndroidFileManager.getAppropriateDirectory(context, dirName, dirType);
@@ -162,7 +162,7 @@ public class AndroidFileManager {
                 File[] allFiles = dir.listFiles();
                 if (allFiles != null) {
                     for (File file : allFiles) {
-                        if (!file.isDirectory() && file.getName().equals(getFileName(uri))) {
+                        if (!file.isDirectory() && file.getName().equals(getFileName(uri, fileNamePrefix))) {
                             foundFile = file;
                             break;
                         }
